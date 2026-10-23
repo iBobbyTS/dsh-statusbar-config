@@ -8,12 +8,12 @@ describe('decodeSettings', () => {
   })
 
   it('fills a missing template with the default (pre-template sections keep loading)', () => {
-    expect(decodeSettings({ enabled: false })).toEqual({ enabled: false, template: '' })
+    expect(decodeSettings({ enabled: false })).toEqual({ enabled: false, template: DEFAULT_SETTINGS.template })
   })
 
   it('ignores legacy toggle keys from 0.1-era sections', () => {
     const legacy = { enabled: true, turns: false, steps: false, llmTime: false, toolTime: false, ttft: true, throughput: true, cacheHit: true, inputTokens: true, outputTokens: true }
-    expect(decodeSettings(legacy)).toEqual({ enabled: true, template: '' })
+    expect(decodeSettings(legacy)).toEqual({ enabled: true, template: DEFAULT_SETTINGS.template })
   })
 
   it('rejects non-objects and wrong types', () => {
@@ -26,6 +26,6 @@ describe('decodeSettings', () => {
   })
 
   it('defaults to enabled with no template', () => {
-    expect(DEFAULT_SETTINGS).toEqual({ enabled: true, template: '' })
+    expect(DEFAULT_SETTINGS).toEqual({ enabled: true, template: "↩ ${cacheRead} · ↓ ${uncachedInput} · ↑ ${output}" })
   })
 })

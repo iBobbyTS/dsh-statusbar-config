@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.2.3 (2026-10-23, iBobbyTS fork)
+
+- Replace native session `usage` via DSH Slot, keeping activity and per-Turn usage unchanged.
+- Display cache-read, uncached input, cache-write and output buckets separately.
+- Show approximate context used/capacity via a scoped CSS override, retaining the native context ring and popup.
+- Add session usage details and tests.
+
 ## 0.2.2 (2026-09-29)
 
 - Adapt to DSH 0.1.7+: the client settings service moved from `settingsScope`

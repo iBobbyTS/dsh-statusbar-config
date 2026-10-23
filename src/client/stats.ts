@@ -3,7 +3,7 @@
  * math (dsh-client-ui-chat), kept field-compatible with the rc-era plugin so
  * behavior is unchanged when segments are toggled on.
  */
-import type { ConversationNode, SessionStatsProjection, TokenUsageProjection } from './types.js'
+import type { ConversationNode, SessionStatsProjection, TokenUsageProjection, ContextPressureProjection } from './types.js'
 import type { StatsTranslate } from './locales.js'
 
 /** Segment selection used only by the default (empty-template) rendering. */
@@ -203,6 +203,15 @@ export function buildStatsGroups(
  * are bare numbers ("5.8", "69"), `${cache}` is the percent integer ("93"),
  * `${input}`/`${output}` are compact token counts ("63.7M").
  */
+/** Next-request context estimate, not a cumulative billed total. */
+export function contextMeterReading(pressure: ContextPressureProjection | undefined): string | null {
+  const used = pressure?.projectedTokens ?? pressure?.pressureTokens
+  const capacity = pressure?.contextWindow
+  if (used === undefined || capacity === undefined || !Number.isFinite(used)
+      || !Number.isFinite(capacity) || used < 0 || capacity <= 0) return null
+  return '≈' + formatTokens(used) + ' / ' + formatTokens(capacity)
+}
+
 export function renderTemplate(
   template: string,
   stats: SessionStatsProjection | undefined,
@@ -220,7 +229,11 @@ export function renderTemplate(
   if (usage !== undefined) {
     values.cache = cacheHitPercent(usage) ?? ''
     values.input = formatTokens(billedInputTokens(usage))
+    values.uncachedInput = formatTokens(usage.uncachedInputTokens)
+    values.cacheRead = formatTokens(usage.cacheReadTokens)
+    values.cacheWrite = formatTokens(usage.cacheWriteTokens)
     values.output = formatTokens(usage.outputTokens)
+    values.total = formatTokens(billedInputTokens(usage) + usage.outputTokens)
   }
   return template.replace(/\$\{([a-zA-Z]+)\}/g, (whole, name: string) => {
     return name in values ? values[name] : whole

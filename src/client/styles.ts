@@ -46,4 +46,22 @@ export const styles = `
 .dsc-chip:disabled{opacity:.4;cursor:default}
 .dsc-chip::after{content:attr(data-tip);position:absolute;top:calc(100% + 6px);left:var(--tip-left,0px);transform:none;width:max-content;max-width:min(320px,80vw);box-sizing:border-box;background:var(--dsw-alias-bg-layer-3);color:var(--dsw-alias-label-primary);border:1px solid var(--dsw-alias-border-l2);border-radius:8px;padding:6px 10px;font-size:12px;line-height:1.5;white-space:normal;text-align:left;box-shadow:var(--dsw-shadow-lv1);opacity:0;pointer-events:none;transition:opacity .12s;z-index:5}
 .dsc-chip:hover::after,.dsc-chip:focus-visible::after{opacity:1}
+
+/* Session token usage pill in DSH's official `usage` dock entry. */
+.dsc-stats{position:relative;box-sizing:border-box;display:inline-flex;flex:none;width:auto;max-width:min(65vw,800px);min-width:0;margin:0;padding:0;overflow:visible;text-align:left;font-size:12px;line-height:20px}
+.dsc-stats-trigger{display:inline-flex;align-items:center;gap:6px;box-sizing:border-box;max-width:100%;min-width:0;padding:1px 8px;border:0;border-radius:var(--dsw-radius-sm);background:transparent;color:var(--dsw-alias-label-tertiary);font:inherit;line-height:inherit;white-space:nowrap;cursor:pointer}
+.dsc-stats-trigger:hover,.dsc-stats-trigger[aria-expanded=true]{background:var(--dsw-alias-interactive-bg-hover);color:var(--dsw-alias-label-secondary)}
+.dsc-stats-trigger:focus-visible{outline:2px solid var(--dsw-alias-brand-primary);outline-offset:2px}
+.dsc-stats-icon{flex:none}
+.dsc-stats-label{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-variant-numeric:tabular-nums}
+.dsc-usage-panel{position:absolute;bottom:calc(100% + 8px);right:0;z-index:1100;box-sizing:border-box;width:min(270px,calc(100vw - 24px));padding:12px;border:1px solid var(--dsw-alias-border-l1);border-radius:var(--dsw-radius-lg);background:var(--dsw-specific-menu);color:var(--dsw-alias-label-secondary);box-shadow:var(--dsw-elevation-prominent);font-size:12px;line-height:20px;white-space:normal;text-align:left}
+.dsc-usage-heading{margin-bottom:8px;padding-bottom:8px;border-bottom:1px solid var(--dsw-alias-border-l2);font-weight:600;color:var(--dsw-alias-label-primary)}
+.dsc-usage-details{display:grid;grid-template-columns:minmax(0,1fr) max-content;gap:4px 10px;margin:0;font-variant-numeric:tabular-nums}
+.dsc-usage-details dt,.dsc-usage-details dd{margin:0}
+.dsc-usage-details dd{color:var(--dsw-alias-label-primary);text-align:right}
+/* ContextMeter is hardcoded after the Slot: preserve its button, ring and dialog. */
+[data-composer-dock][data-dsc-context-meter=true] > span:last-child button[aria-haspopup=dialog] > span{display:none}
+[data-composer-dock][data-dsc-context-meter=true] > span:last-child button[aria-haspopup=dialog]::after{content:var(--dsc-context-meter-label);font-variant-numeric:tabular-nums;white-space:nowrap}
+@media(max-width:700px){.dsc-stats{max-width:42vw}.dsc-stats-trigger{padding-inline:3px}[data-composer-dock][data-dsc-context-meter=true] > span:last-child button[aria-haspopup=dialog]{padding-inline:3px}}
+
 `

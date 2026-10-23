@@ -25,6 +25,13 @@ export interface TokenUsageProjection {
   outputTokens: number
 }
 
+/** Approximate provider-anchored context occupancy. */
+export interface ContextPressureProjection {
+  pressureTokens?: number
+  projectedTokens?: number
+  contextWindow?: number
+}
+
 /** Minimal shapes of the chat-node window used by the fallback fold. */
 export interface ConversationNodeTiming {
   stepStartTime: number | null
