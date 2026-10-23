@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.3.1 (2026-10-23, iBobbyTS fork)
+
+- Remove the leading `↩ /↑/↓ | ` legend from the Session / Window usage footer.
+- Migrate saved former default templates (including the spaced legend) without changing custom templates.
+- Supply localized Plugin Manager display metadata titled **Statusbar Enhancement**.
+- Keep npm package, Cordis plugin and persisted settings identifiers unchanged.
+- Synchronize prebuilt Host/Client bundles and update tests/documentation.
+
 ## 0.3.0 (2026-10-23, iBobbyTS fork)
 
 - Add Host Session Projection for cumulative Window usage since the last successful compaction.

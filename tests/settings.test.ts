@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { DEFAULT_SETTINGS, decodeSettings, resolveUsageTemplate } from '../src/settings.js'
+import { DEFAULT_SETTINGS, decodeSettings, resolveUsageTemplate, LEGACY_DUAL_DEFAULT_TEMPLATE, SPACED_DUAL_DEFAULT_TEMPLATE } from '../src/settings.js'
 
 describe('decodeSettings', () => {
   it('accepts a full section', () => {
@@ -27,10 +27,13 @@ describe('decodeSettings', () => {
 
   it('migrates only the previously shipped default', () => {
     expect(resolveUsageTemplate("↩ ${cacheRead} · ↑ ${uncachedInput} · ↓ ${output}")).toBe(DEFAULT_SETTINGS.template)
+    expect(resolveUsageTemplate(LEGACY_DUAL_DEFAULT_TEMPLATE)).toBe(DEFAULT_SETTINGS.template)
+    expect(resolveUsageTemplate(SPACED_DUAL_DEFAULT_TEMPLATE)).toBe(DEFAULT_SETTINGS.template)
+    expect(decodeSettings({ enabled: true, template: LEGACY_DUAL_DEFAULT_TEMPLATE })?.template).toBe(DEFAULT_SETTINGS.template)
     expect(resolveUsageTemplate('custom ${output}')).toBe('custom ${output}')
   })
 
   it('defaults to enabled with no template', () => {
-    expect(DEFAULT_SETTINGS).toEqual({ enabled: true, template: "↩ /↑/↓ | Session: ${cacheRead}/${uncachedInput}/${output} | Window: ${windowCacheRead}/${windowUncachedInput}/${windowOutput}" })
+    expect(DEFAULT_SETTINGS).toEqual({ enabled: true, template: "Session: ${cacheRead}/${uncachedInput}/${output} | Window: ${windowCacheRead}/${windowUncachedInput}/${windowOutput}" })
   })
 })

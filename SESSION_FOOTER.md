@@ -12,7 +12,7 @@
 ## UI
 
 - Only the native `conversation.composer.dock` `usage` item (order 1, priority -1) is overridden. `activity` and per-Turn usage, branching and feedback remain unchanged.
-- Default footer is `↩ /↑/↓ | Session: R/I/O | Window: R/I/O`.
+- Default footer is `Session: R/I/O | Window: R/I/O`; value order is still cache read / uncached input / output.
 - When Window projection is absent, show an explicit `—` placeholder. Persisted old default templates are normalized without changing unrelated user preferences.
 - Session and Window exact counts are exposed in the click dialog.
 - The ContextMeter visible label uses DSH's `contextPressure` and a separate scoped CSS override; it is **not** the Window accumulated usage.

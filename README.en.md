@@ -7,7 +7,7 @@ This fork replaces only the **Session usage** item through DSH's official `conve
 Default:
 
 ```text
-↩ /↑/↓ | Session: 70M/1M/130K | Window: 10M/200K/30K
+Session: 70M/1M/130K | Window: 10M/200K/30K
 ```
 
 The three values in each group are cache-read input / uncached input / output tokens.
@@ -31,7 +31,7 @@ Use `--profile web` for the browser profile. Restart DSH after installation so t
 Configure via **Settings → Plugins → Status bar template**:
 
 ```text
-↩ /↑/↓ | Session: ${cacheRead}/${uncachedInput}/${output} | Window: ${windowCacheRead}/${windowUncachedInput}/${windowOutput}
+Session: ${cacheRead}/${uncachedInput}/${output} | Window: ${windowCacheRead}/${windowUncachedInput}/${windowOutput}
 ```
 
 | Variable | Meaning |

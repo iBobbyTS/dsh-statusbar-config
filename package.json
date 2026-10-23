@@ -1,13 +1,14 @@
 {
   "name": "dsh-statusbar-config",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "Session and post-compaction Window token usage for DeepSeek Harness",
   "type": "module",
   "main": "lib/index.js",
   "exports": {
     ".": "./lib/index.js",
     "./client": "./lib/client.js",
-    "./package.json": "./package.json"
+    "./package.json": "./package.json",
+    "./locale/*.json": "./locale/*.json"
   },
   "files": [
     "lib/index.js",
@@ -17,7 +18,8 @@
     "cordis.patch.yml",
     "README.md",
     "README.en.md",
-    "LICENSE"
+    "LICENSE",
+    "locale/*.json"
   ],
   "dsh": {
     "bundle": {

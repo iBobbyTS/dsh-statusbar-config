@@ -7,7 +7,7 @@
 默认格式：
 
 ```text
-↩ /↑/↓ | Session: 70M/1M/130K | Window: 10M/200K/30K
+Session: 70M/1M/130K | Window: 10M/200K/30K
 ```
 
 **固定顺序**：缓存读取 / 未缓存输入 / 模型输出。数字为示意值。
@@ -31,7 +31,7 @@ dsh plugin --profile desktop add github:iBobbyTS/dsh-statusbar-config
 **设置 → 插件 → 状态栏模板**。默认：
 
 ```text
-↩ /↑/↓ | Session: ${cacheRead}/${uncachedInput}/${output} | Window: ${windowCacheRead}/${windowUncachedInput}/${windowOutput}
+Session: ${cacheRead}/${uncachedInput}/${output} | Window: ${windowCacheRead}/${windowUncachedInput}/${windowOutput}
 ```
 
 | 变量 | 含义 |

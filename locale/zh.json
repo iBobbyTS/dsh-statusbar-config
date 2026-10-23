@@ -1,0 +1,6 @@
+{
+  "meta": {
+    "title": "Statusbar Enhancement",
+    "description": "增强 DeepSeek Harness 状态栏，显示会话累计与压缩后窗口的 Token 用量。"
+  }
+}

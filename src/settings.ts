@@ -8,6 +8,9 @@
  */
 export const SETTINGS_NAMESPACE_VALUE = 'status-bar-config'
 export const PREVIOUS_DEFAULT_TEMPLATE = "↩ ${cacheRead} · ↑ ${uncachedInput} · ↓ ${output}"
+/** Saved defaults from version 0.3.0 (and a spacing variant). */
+export const LEGACY_DUAL_DEFAULT_TEMPLATE = "↩ /↑/↓ | Session: ${cacheRead}/${uncachedInput}/${output} | Window: ${windowCacheRead}/${windowUncachedInput}/${windowOutput}"
+export const SPACED_DUAL_DEFAULT_TEMPLATE = "↩ / ↑ / ↓ | Session: ${cacheRead}/${uncachedInput}/${output} | Window: ${windowCacheRead}/${windowUncachedInput}/${windowOutput}"
 
 export interface StatusbarSettings {
   enabled: boolean
@@ -17,12 +20,16 @@ export interface StatusbarSettings {
 
 export const DEFAULT_SETTINGS: Readonly<StatusbarSettings> = Object.freeze({
   enabled: true,
-  template: "↩ /↑/↓ | Session: ${cacheRead}/${uncachedInput}/${output} | Window: ${windowCacheRead}/${windowUncachedInput}/${windowOutput}",
+  template: "Session: ${cacheRead}/${uncachedInput}/${output} | Window: ${windowCacheRead}/${windowUncachedInput}/${windowOutput}",
 })
 
 /** Upgrade the shipped default without overwriting unrelated custom templates. */
 export function resolveUsageTemplate(template: string): string {
-  return template.trim() === PREVIOUS_DEFAULT_TEMPLATE ? DEFAULT_SETTINGS.template : template
+  const value = template.trim()
+  return value === PREVIOUS_DEFAULT_TEMPLATE
+    || value === LEGACY_DUAL_DEFAULT_TEMPLATE
+    || value === SPACED_DUAL_DEFAULT_TEMPLATE
+    ? DEFAULT_SETTINGS.template : template
 }
 
 /**
