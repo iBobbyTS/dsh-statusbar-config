@@ -4,7 +4,7 @@
 
 基于原项目的 Fork。通过 DSH 官方 `conversation.composer.dock` / `usage` Slot，仅替换**输入框底部 Session 累计用量**，保留原生轮数、步数、速度及每个 Turn 末尾的用量统计。
 
-默认显示示意：`↩ 51.3M · ↓ 500K · ↑ 120K`（缓存读取、未缓存输入、模型输出）。
+默认显示示意：`↩ 51.3M · ↑ 500K · ↓ 120K`（缓存读取、未缓存输入、模型输出）。
 
 ## 安装
 
@@ -19,7 +19,7 @@ dsh plugin --profile desktop add github:iBobbyTS/dsh-statusbar-config
 **设置 → 插件 → 状态栏模板**，默认模板：
 
 ```text
-↩ ${cacheRead} · ↓ ${uncachedInput} · ↑ ${output}
+↩ ${cacheRead} · ↑ ${uncachedInput} · ↓ ${output}
 ```
 
 | 变量 | 含义 |

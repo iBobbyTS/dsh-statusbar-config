@@ -16,7 +16,7 @@ export interface StatusbarSettings {
 
 export const DEFAULT_SETTINGS: Readonly<StatusbarSettings> = Object.freeze({
   enabled: true,
-  template: "↩ ${cacheRead} · ↓ ${uncachedInput} · ↑ ${output}",
+  template: "↩ ${cacheRead} · ↑ ${uncachedInput} · ↓ ${output}",
 })
 
 /**

@@ -26,6 +26,6 @@ describe('decodeSettings', () => {
   })
 
   it('defaults to enabled with no template', () => {
-    expect(DEFAULT_SETTINGS).toEqual({ enabled: true, template: "↩ ${cacheRead} · ↓ ${uncachedInput} · ↑ ${output}" })
+    expect(DEFAULT_SETTINGS).toEqual({ enabled: true, template: "↩ ${cacheRead} · ↑ ${uncachedInput} · ↓ ${output}" })
   })
 })

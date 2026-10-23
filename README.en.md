@@ -4,7 +4,7 @@
 
 This fork replaces only the **session-level usage pill** beneath the composer via DSH's native `conversation.composer.dock` / `usage` Slot. The native turns, steps and token speed, and every per-Turn usage row remain unchanged.
 
-Example: `↩ 51.3M · ↓ 500K · ↑ 120K` (cache reads, uncached input and output).
+Example: `↩ 51.3M · ↑ 500K · ↓ 120K` (cache reads, uncached input and output).
 
 ## Install
 
@@ -19,7 +19,7 @@ Use `--profile web` for the browser profile. Restart DSH after installation. The
 Open **Settings → Plugins → Status bar template**. Default:
 
 ```text
-↩ ${cacheRead} · ↓ ${uncachedInput} · ↑ ${output}
+↩ ${cacheRead} · ↑ ${uncachedInput} · ↓ ${output}
 ```
 
 | Variable | Meaning |

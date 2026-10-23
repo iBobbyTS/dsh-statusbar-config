@@ -6,8 +6,8 @@ const usage: TokenUsageProjection = {
 }
 describe('session usage footer', () => {
   it('keeps the input buckets separate', () => {
-    expect(renderTemplate('↩ ${cacheRead} · ↓ ${uncachedInput} · ↑ ${output}', undefined, usage))
-      .toBe('↩ 51.3M · ↓ 500K · ↑ 120K')
+    expect(renderTemplate('↩ ${cacheRead} · ↑ ${uncachedInput} · ↓ ${output}', undefined, usage))
+      .toBe('↩ 51.3M · ↑ 500K · ↓ 120K')
     expect(renderTemplate('${cacheWrite} / ${input} / ${total}', undefined, usage))
       .toBe('20K / 51.8M / 51.9M')
     expect(billedInputTokens(usage)).toBe(51_820_000)
