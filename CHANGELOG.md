@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.3.0 (2026-10-23, iBobbyTS fork)
+
+- Add Host Session Projection for cumulative Window usage since the last successful compaction.
+- Preserve native lifetime Session totals; cover all Turns, retries and historical replay.
+- Change footer to `↩ /↑/↓ | Session: R/I/O | Window: R/I/O`.
+- Add Window detail rows, template placeholders, migration of the prior default, tests and prebuilt bundles.
+
 ## 0.2.3 (2026-10-23, iBobbyTS fork)
 
 - Replace native session `usage` via DSH Slot, keeping activity and per-Turn usage unchanged.
