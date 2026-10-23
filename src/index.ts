@@ -16,7 +16,7 @@ export type Config = StatusbarSettings
 
 export const Config: Schema<Config> = Schema.object({
   enabled: Schema.boolean().default(DEFAULT_SETTINGS.enabled).description('Display the configurable statistics row below the composer.'),
-  template: Schema.string().default(DEFAULT_SETTINGS.template).role('textarea').description('Display template with ${variable} placeholders; empty = default statistics row. Variables: ${turns} ${steps} ${llm} ${tool} ${ttft} ${tps} ${cache} ${input} ${output}.'),
+  template: Schema.string().default(DEFAULT_SETTINGS.template).role('textarea').description('Display template with ${variable} placeholders; empty = default statistics row. Variables: ${turns} ${steps} ${llm} ${tool} ${ttft} ${tps} ${cache} ${input} ${output} ${cacheRead} ${uncachedInput} ${cacheWrite} ${total}.'),
 })
 
 export function apply(ctx: Context, config: Config): void {

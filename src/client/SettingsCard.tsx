@@ -9,7 +9,7 @@ export interface SettingsCardProps {
 }
 
 /** Clickable variable chips, most-useful first. */
-const VARIABLES = ['ttft', 'tps', 'cache', 'input', 'output', 'turns', 'steps', 'llm', 'tool'] as const
+const VARIABLES = ['cacheRead', 'uncachedInput', 'cacheWrite', 'output', 'input', 'total', 'cache', 'ttft', 'tps', 'turns', 'steps', 'llm', 'tool'] as const
 
 type Notice = { kind: 'success' | 'error'; text: string } | undefined
 

@@ -1,6 +1,6 @@
 /**
  * Browser half: shadow the shipped `conversation.composer.dock` entry with
- * id `stats` (lower priority wins the cell) and contribute the settings card
+ * id `usage` (lower priority wins the cell) and contribute the settings card
  * on this bundle's page in the Plugins section (`plugins.bundle.config`).
  */
 import type { ClientContextLike } from './runtime.js'
@@ -44,8 +44,8 @@ export function apply(ctx: ClientContextLike): void {
 
   ctx.slots.inject('conversation.composer.dock', () => ctx.slots.register({
     name: 'conversation.composer.dock',
-    id: 'stats',
-    order: 0,
+    id: 'usage',
+    order: 1,
     priority: -1,
     locale: LOCALE_NAMESPACE,
     inject: () => ({ settings }) as Record<string, unknown>,
