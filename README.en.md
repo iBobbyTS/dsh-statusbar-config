@@ -1,83 +1,55 @@
-# dsh-statusbar-config
+# dsh-statusbar-config — Session footer fork
 
-**English** | [中文](./README.md)
+[中文](README.md) · [Original MannixHu/dsh-statusbar-config](https://github.com/MannixHu/dsh-statusbar-config) · MIT
 
-A [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness) web UI plugin that makes the conversation statistics row below the composer **fully template-driven** — JS template-literal syntax `${variable}`, write whatever you want, applies live.
+This fork replaces only the **session-level usage pill** beneath the composer via DSH's native `conversation.composer.dock` / `usage` Slot. The native turns, steps and token speed, and every per-Turn usage row remain unchanged.
 
-[![stars](https://img.shields.io/github/stars/MannixHu/dsh-statusbar-config?style=flat)](https://github.com/MannixHu/dsh-statusbar-config)
-[![license](https://img.shields.io/badge/license-MIT-blue)](./LICENSE)
-
-<p align="center"><img src="./assets/stats-bar.png" alt="Rendered stats bar: only the segments your template names" width="560"></p>
-
-It shadows the shipped `stats` entry in the `conversation.composer.dock` slot (lower priority wins the cell) with the same data and precision as the official StatsLine; the display content is entirely your template.
-
-## Template variables
-
-| Variable | Meaning | Example |
-|---|---|---|
-| `${ttft}` | average time to first token, seconds (bare number) | `5.8` |
-| `${tps}` | decode throughput, tok/s (bare number) | `69` |
-| `${cache}` | cache hit percent (no `%` sign) | `93` |
-| `${input}` | billed input tokens (compact) | `63.7M` |
-| `${output}` | output tokens (compact) | `178K` |
-| `${turns}` / `${steps}` | turns / steps | `12` / `34` |
-| `${llm}` / `${tool}` | cumulative LLM / tool time (unit included) | `3m12s` |
-
-Units, separators, and any literal text are yours to write in the template; unknown variables stay verbatim; variables without data yet render empty.
+Example: `↩ 51.3M · ↓ 500K · ↑ 120K` (cache reads, uncached input and output).
 
 ## Install
 
 ```bash
-dsh plugin --profile web add github:MannixHu/dsh-statusbar-config
+dsh plugin --profile desktop add github:iBobbyTS/dsh-statusbar-config
 ```
 
-Then restart `dsh web` (the loader graph is frozen at process start).
+Use `--profile web` for the browser profile. Restart DSH after installation. The repository includes prebuilt `lib/` artifacts.
 
 ## Configure
 
-Two equivalent ways:
+Open **Settings → Plugins → Status bar template**. Default:
 
-- **In the UI** — Settings → Plugins → *Status bar template* card: click a variable chip to insert at the cursor, Enter to save, applies immediately (recommended).
-- **In `~/.dsh/settings.yaml`** — the `status-bar-config` namespace:
-
-```yaml
-status-bar-config:
-  enabled: true
-  template: 'TTFT avg ${ttft}s · ${tps} tok/s | Cache ${cache}% | In ${input} tok · Out ${output} tok'
+```text
+↩ ${cacheRead} · ↓ ${uncachedInput} · ↑ ${output}
 ```
 
-renders:
+| Variable | Meaning |
+|---|---|
+| `${cacheRead}` | Cached prompt input |
+| `${uncachedInput}` | Uncached prompt input |
+| `${cacheWrite}` | Cache writes |
+| `${output}` | Output tokens (including reasoning) |
+| `${input}` | Total input including cache reads and writes |
+| `${total}` | All input plus output |
+| `${cache}` | Cache hit percent without % |
+| `${turns}` / `${steps}` | Turns and steps |
+| `${ttft}` / `${tps}` | Average TTFT seconds and token/s |
+| `${llm}` / `${tool}` | Model/tool wall time |
 
-```
-TTFT avg 5.8s · 69 tok/s | Cache 93% | In 63.7M tok · Out 178K tok
-```
+An empty template shows session total and cache hit; unknown variables remain visible. Clicking the custom usage pill opens exact usage counts.
 
-Empty `template` = default statistics row (the full shipped segments); `enabled: false` hides the row. The 0.1 per-segment toggles are superseded by the template — legacy yaml boolean keys are ignored; switch to `template` after upgrading.
+## Context
 
-## Migration
+The native percent's visible text is overlaid with an approximate `≈used / capacity` reading, using `contextPressure.projectedTokens` (fallback `pressureTokens`) and `contextWindow`. This is **not cumulative session usage**. Its native ring, popup, tooltip and percentage-based accessibility label remain intact.
 
-**From the 0.1 segment toggles**: 0.2 replaces them with the template. Legacy boolean keys in yaml are ignored — rewrite your toggle combination as one `template:` line; for example, with only ttft/throughput/cacheHit/input/output on:
+DSH has no dedicated ContextMeter replacement Slot, so the context label uses a scoped CSS override that may need updating with newer DSH DOM versions.
 
-```yaml
-status-bar-config:
-  enabled: true
-  template: 'TTFT avg ${ttft}s · ${tps} tok/s | Cache ${cache}% | In ${input} tok · Out ${output} tok'
-```
-
-**From leonardoxr/dsh-status-bar-config**: this plugin keeps the same `status-bar-config` namespace, so your existing settings section loads as-is. That plugin's inject list depends on `@deepseek-ai/dsh-client-runtime` / `dsh-client-ui-slots`, which the 0.1.2-alpha reorganization removed; this plugin is rewritten against the post-alpha package graph and needs no inject patch.
-
-## Compatibility
-
-- Requires DSH `0.1.7`+ (client config goes through the `configForms` service; use 0.2.1 on older hosts).
-- The built bundle (`lib/`) is committed, so installing from git needs no build step and no `onlyBuiltDependencies` entry.
-
-## Build from source
+## Develop
 
 ```bash
-pnpm install
-pnpm check   # typecheck + build (lib/index.js host half, lib/client.js browser half)
+pnpm install --frozen-lockfile
+pnpm check
 ```
 
-## License
+Keep prebuilt `lib/` synchronized with `src/`. Current source maps are valid no-mapping placeholders; rebuilding generates mapped versions. See [SESSION_FOOTER.md](SESSION_FOOTER.md).
 
-MIT
+MIT license; original author MannixHu.

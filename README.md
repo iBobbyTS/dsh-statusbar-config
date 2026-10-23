@@ -1,83 +1,55 @@
-# dsh-statusbar-config
+# dsh-statusbar-config — Session 状态栏定制版
 
-[English](./README.en.md) | **中文**
+[English](README.en.md) · [原仓库 MannixHu/dsh-statusbar-config](https://github.com/MannixHu/dsh-statusbar-config) · MIT
 
-[DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness) Web UI 插件：用**模板完全自定义**输入框下方的会话统计行——JS 模板字符串语法 `${变量}`，想要什么写什么，即时生效。
+基于原项目的 Fork。通过 DSH 官方 `conversation.composer.dock` / `usage` Slot，仅替换**输入框底部 Session 累计用量**，保留原生轮数、步数、速度及每个 Turn 末尾的用量统计。
 
-[![stars](https://img.shields.io/github/stars/MannixHu/dsh-statusbar-config?style=flat)](https://github.com/MannixHu/dsh-statusbar-config)
-[![license](https://img.shields.io/badge/license-MIT-blue)](./LICENSE)
-
-<p align="center"><img src="./assets/stats-bar.png" alt="状态栏模板渲染效果：只显示模板里写的段落" width="560"></p>
-
-实现方式：以更低优先级影子化 `conversation.composer.dock` 槽位中官方的 `stats` 条目，数据与官方 StatsLine 同源同精度，显示内容完全由你的模板决定。
-
-## 模板变量
-
-| 变量 | 含义 | 示例值 |
-|---|---|---|
-| `${ttft}` | 首 token 平均秒数（纯数字） | `5.8` |
-| `${tps}` | 解码速度 tok/s（纯数字） | `69` |
-| `${cache}` | 缓存命中率（百分数，不带 %） | `93` |
-| `${input}` | 计费输入 token（紧凑格式） | `63.7M` |
-| `${output}` | 输出 token（紧凑格式） | `178K` |
-| `${turns}` / `${steps}` | 轮数 / 步数 | `12` / `34` |
-| `${llm}` / `${tool}` | LLM / 工具调用累计时长（自带单位） | `3m12s` |
-
-单位、分隔符、任何文字都由你写在模板里；未知变量原样显示；暂无数据的变量渲染为空。
+默认显示示意：`↩ 51.3M · ↓ 500K · ↑ 120K`（缓存读取、未缓存输入、模型输出）。
 
 ## 安装
 
 ```bash
-dsh plugin --profile web add github:MannixHu/dsh-statusbar-config
+dsh plugin --profile desktop add github:iBobbyTS/dsh-statusbar-config
 ```
 
-然后重启 `dsh web`（加载器图在进程启动时冻结）。
+如使用浏览器 Profile，将 `desktop` 改为 `web`。安装后重启对应 DSH。仓库内预置 `lib/`，无需在安装时构建。
 
 ## 配置
 
-两种等价方式：
+**设置 → 插件 → 状态栏模板**，默认模板：
 
-- **界面里** — 设置 → 插件 → *状态栏模板* 卡片：点变量芯片插入到光标处，回车保存，即时生效（推荐）。
-- **`~/.dsh/settings.yaml`** — `status-bar-config` 命名空间：
-
-```yaml
-status-bar-config:
-  enabled: true
-  template: '首 token 平均 ${ttft}s · ${tps} tok/s | 缓存命中 ${cache}% | 输入 ${input} tok · 输出 ${output} tok'
+```text
+↩ ${cacheRead} · ↓ ${uncachedInput} · ↑ ${output}
 ```
 
-渲染结果：
+| 变量 | 含义 |
+|---|---|
+| `${cacheRead}` | 缓存读取 Token |
+| `${uncachedInput}` | 未缓存输入 Token |
+| `${cacheWrite}` | 缓存写入 Token |
+| `${output}` | 输出 Token（包含推理） |
+| `${input}` | 所有输入，包括缓存读写 |
+| `${total}` | 输入与输出总和 |
+| `${cache}` | 缓存命中率（不带 %） |
+| `${turns}` / `${steps}` | 会话轮数 / 步数 |
+| `${ttft}` / `${tps}` | 首 Token 平均秒数 / 输出速度 |
+| `${llm}` / `${tool}` | 模型 / 工具累计耗时 |
 
-```
-首 token 平均 5.8s · 69 tok/s | 缓存命中 93% | 输入 63.7M tok · 输出 178K tok
-```
+模板留空时显示会话累计 Token 和缓存命中率；未知变量保持原样。点击用量可查看精确 Token 分类。
 
-`template` 留空 = 默认统计行（与官方相同的全量段落）；`enabled: false` = 整行隐藏。0.1 版的段落开关已被模板取代，旧的 yaml 布尔键会被忽略，升级后改用 `template` 即可。
+## 上下文窗口
 
-## 迁移
+原生 `14%` 的可见文字改成类似 `≈38K / 200K`，根据 `contextPressure.projectedTokens`（或 `pressureTokens`）与 `contextWindow` 显示。**这是近似的当前上下文使用量，不是累计 Token 用量。** 保留官方圆环、弹窗、Tooltip 和无障碍百分比描述。
 
-**从 0.1 的段落开关升级**：0.2 起开关由模板取代。旧的 yaml 布尔键会被忽略，把原来的开关组合改写成一条 `template:` 即可，例如原来只开 ttft/throughput/cacheHit/input/output 时：
+上下文组件目前缺少独立可替换的 Slot，因此本功能采用局部 CSS 适配，后续 DSH 更新可能需要调整。
 
-```yaml
-status-bar-config:
-  enabled: true
-  template: '首 token 平均 ${ttft}s · ${tps} tok/s | 缓存命中 ${cache}% | 输入 ${input} tok · 输出 ${output} tok'
-```
-
-**从 leonardoxr/dsh-status-bar-config 迁移**：本插件沿用同一命名空间 `status-bar-config`，settings.yaml 里的段落直接可读；但该插件依赖的 `@deepseek-ai/dsh-client-runtime` / `dsh-client-ui-slots` 已在 0.1.2-alpha 重组中移除，本插件按 alpha 后的包图重写，无需再打 inject 补丁。
-
-## 兼容性
-
-- 需要 DSH `0.1.7`+（客户端配置走 `configForms` 服务；更早版本请用 0.2.1）。
-- 构建产物（`lib/`）随仓库提交，git 安装无需构建步骤，也不需要 `onlyBuiltDependencies` 白名单。
-
-## 从源码构建
+## 开发与验证
 
 ```bash
-pnpm install
-pnpm check   # 类型检查 + 构建（lib/index.js 宿主半，lib/client.js 浏览器半）
+pnpm install --frozen-lockfile
+pnpm check
 ```
 
-## 许可
+修改源码后需同步构建 `lib/` 才能通过 Git 安装。当前 Source Map 是合法空映射；重新构建可生成准确 Source Map。详见 [SESSION_FOOTER.md](SESSION_FOOTER.md)。
 
-MIT
+保留原作者 MannixHu 的 MIT 许可证与署名。
