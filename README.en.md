@@ -1,10 +1,22 @@
-# dsh-statusbar-config — Session footer fork
+# dsh-statusbar-config — Session / Window footer fork
 
 [中文](README.md) · [Original MannixHu/dsh-statusbar-config](https://github.com/MannixHu/dsh-statusbar-config) · MIT
 
-This fork replaces only the **session-level usage pill** beneath the composer via DSH's native `conversation.composer.dock` / `usage` Slot. The native turns, steps and token speed, and every per-Turn usage row remain unchanged.
+This fork replaces only the **Session usage** item through DSH's official `conversation.composer.dock` / `usage` Slot. Native `activity` (turns, steps, throughput) and all completed-Turn usage controls are unchanged.
 
-Example: `↩ 51.3M · ↑ 500K · ↓ 120K` (cache reads, uncached input and output).
+Default:
+
+```text
+↩ /↑/↓ | Session: 70M/1M/130K | Window: 10M/200K/30K
+```
+
+The three values in each group are cache-read input / uncached input / output tokens.
+
+- **Session**: DSH's authoritative cumulative `tokenUsage` projection for the complete durable session.
+- **Window**: All model usage **since the most recent successful compaction**, across multiple Turns. This is a billing interval, not the current live prompt occupancy.
+- An unsuccessful compaction does not reset the Window. Before the first successful compaction, Window is accumulated from session start. Subsequent successful `compaction/end` events start a new epoch.
+- The `statusbarWindowUsage` Host Session Projection replays durable events and obeys the same replacement/retry semantics as native `tokenUsage`. It supports historic Session replay and registry checkpoints.
+- Compaction summarizer-only model calls are not included (matching the native Session `tokenUsage` accounting).
 
 ## Install
 
@@ -12,44 +24,41 @@ Example: `↩ 51.3M · ↑ 500K · ↓ 120K` (cache reads, uncached input and ou
 dsh plugin --profile desktop add github:iBobbyTS/dsh-statusbar-config
 ```
 
-Use `--profile web` for the browser profile. Restart DSH after installation. The repository includes prebuilt `lib/` artifacts.
+Use `--profile web` for the browser profile. Restart DSH after installation so the Host projection registers. The prebuilt `lib/` bundle is included.
 
-## Configure
+## Templates
 
-Open **Settings → Plugins → Status bar template**. Default:
+Configure via **Settings → Plugins → Status bar template**:
 
 ```text
-↩ ${cacheRead} · ↑ ${uncachedInput} · ↓ ${output}
+↩ /↑/↓ | Session: ${cacheRead}/${uncachedInput}/${output} | Window: ${windowCacheRead}/${windowUncachedInput}/${windowOutput}
 ```
 
 | Variable | Meaning |
 |---|---|
-| `${cacheRead}` | Cached prompt input |
-| `${uncachedInput}` | Uncached prompt input |
-| `${cacheWrite}` | Cache writes |
-| `${output}` | Output tokens (including reasoning) |
-| `${input}` | Total input including cache reads and writes |
-| `${total}` | All input plus output |
-| `${cache}` | Cache hit percent without % |
-| `${turns}` / `${steps}` | Turns and steps |
-| `${ttft}` / `${tps}` | Average TTFT seconds and token/s |
-| `${llm}` / `${tool}` | Model/tool wall time |
+| `${cacheRead}` / `${uncachedInput}` / `${output}` | Session cache reads / uncached input / output |
+| `${windowCacheRead}` / `${windowUncachedInput}` / `${windowOutput}` | Window cache reads / uncached input / output |
+| `${cacheWrite}` / `${windowCacheWrite}` | Cache-write input in each interval |
+| `${input}` / `${total}` | Session total input / combined tokens |
+| `${windowTotal}` | Window combined tokens |
+| `${cache}` | Session cache-hit percent |
+| `${turns}` / `${steps}` / `${ttft}` / `${tps}` | Turn/step counts, first-token latency, decode speed |
 
-An empty template shows session total and cache hit; unknown variables remain visible. Clicking the custom usage pill opens exact usage counts.
+Existing users with the previous **default** are migrated automatically at render time; unrelated custom templates remain unchanged. If the Host Window projection has not arrived, the Window values show `—` rather than duplicating Session totals.
 
-## Context
+Click the session pill for exact count details for both intervals, including nonzero cache writes.
 
-The native percent's visible text is overlaid with an approximate `used / capacity` reading, using `contextPressure.projectedTokens` (fallback `pressureTokens`) and `contextWindow`. This is **not cumulative session usage**. Its native ring, popup, tooltip and percentage-based accessibility label remain intact.
+## Context occupancy
 
-DSH has no dedicated ContextMeter replacement Slot, so the context label uses a scoped CSS override that may need updating with newer DSH DOM versions.
+The separate native ContextMeter continues to show `used / capacity` instead of percent as a visible label. This uses `contextPressure` and is independent of the post-compaction billed totals. Native ring and dialog remain intact; since DSH has no ContextMeter Slot, the visible label uses a scoped CSS compatibility override.
 
-## Develop
+## Development
 
 ```bash
 pnpm install --frozen-lockfile
 pnpm check
 ```
 
-Keep prebuilt `lib/` synchronized with `src/`. Current source maps are valid no-mapping placeholders; rebuilding generates mapped versions. See [SESSION_FOOTER.md](SESSION_FOOTER.md).
+Keep checked-in `lib/` (Host and Client) synchronized with `src/` for no-build Git plugin installation. See [SESSION_FOOTER.md](SESSION_FOOTER.md).
 
 MIT license; original author MannixHu.

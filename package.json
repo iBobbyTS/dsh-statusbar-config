@@ -1,7 +1,7 @@
 {
   "name": "dsh-statusbar-config",
-  "version": "0.2.3",
-  "description": "Template-driven DSH session usage with separate cache and input/output token buckets",
+  "version": "0.3.0",
+  "description": "Session and post-compaction Window token usage for DeepSeek Harness",
   "type": "module",
   "main": "lib/index.js",
   "exports": {
@@ -82,5 +82,8 @@
     "url": "git+https://github.com/iBobbyTS/dsh-statusbar-config.git"
   },
   "bugs": "https://github.com/iBobbyTS/dsh-statusbar-config/issues",
-  "author": "MannixHu"
+  "author": "MannixHu",
+  "dependencies": {
+    "zod": "^4.5.4"
+  }
 }

@@ -1,6 +1,6 @@
 import { defineConfig } from 'tsdown'
 
-const external = [/^@deepseek-ai\//, 'react', 'react/jsx-runtime']
+const external = [/^@deepseek-ai\//, 'react', 'react/jsx-runtime', 'zod']
 
 export default defineConfig([
   {
