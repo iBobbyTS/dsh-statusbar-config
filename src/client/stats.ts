@@ -5,6 +5,7 @@
  */
 import type { ConversationNode, SessionStatsProjection, TokenUsageProjection, ContextPressureProjection, WindowUsageProjection } from './types.js'
 import type { StatsTranslate } from './locales.js'
+import { DEFAULT_SETTINGS } from '../settings.js'
 
 /** Segment selection used only by the default (empty-template) rendering. */
 export interface SegmentToggles {
@@ -210,6 +211,18 @@ export function contextMeterReading(pressure: ContextPressureProjection | undefi
   if (used === undefined || capacity === undefined || !Number.isFinite(used)
       || !Number.isFinite(capacity) || used < 0 || capacity <= 0) return null
   return formatTokens(used) + ' / ' + formatTokens(capacity)
+}
+
+/** Collapse the stock two-interval display until this Session has a successful compaction. */
+export function selectFooterTemplate(
+  template: string,
+  windowUsage: WindowUsageProjection | undefined,
+): string {
+  // A missing Host projection is not evidence of zero compactions; retain
+  // the explicit Window-unavailable indicator in that case.
+  return template === DEFAULT_SETTINGS.template && windowUsage?.compactionCount === 0
+    ? '${cacheRead}/${uncachedInput}/${output}'
+    : template
 }
 
 export function renderTemplate(

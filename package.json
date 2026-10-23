@@ -1,6 +1,6 @@
 {
   "name": "dsh-statusbar-config",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "description": "Session and post-compaction Window token usage for DeepSeek Harness",
   "type": "module",
   "main": "lib/index.js",

@@ -3,7 +3,7 @@ import type { SettingsScopeLike } from './runtime.js'
 import type { ContextPressureProjection, ConversationNode, SessionStatsProjection, SnapshotSelector, TokenUsageProjection, WindowUsageProjection } from './types.js'
 import { DEFAULT_SETTINGS, resolveUsageTemplate, type StatusbarSettings } from '../settings.js'
 import type { Translate } from './locales.js'
-import { billedInputTokens, cacheHitPercent, contextMeterReading, deriveStats, formatTokens, renderTemplate } from './stats.js'
+import { billedInputTokens, cacheHitPercent, contextMeterReading, deriveStats, formatTokens, renderTemplate, selectFooterTemplate } from './stats.js'
 
 export interface DockProps {
   settings: SettingsScopeLike<StatusbarSettings>
@@ -30,7 +30,7 @@ export function ConfigurableStatsLine({ settings, t, useChat, useProjection }: D
   const hit = usage === undefined ? null : cacheHitPercent(usage)
   const template = resolveUsageTemplate(value.template.trim()).trim()
   const line = !value.enabled || !hasUsage || usage === undefined ? ''
-    : template !== '' ? renderTemplate(template, stats, usage, windowUsage).trim()
+    : template !== '' ? renderTemplate(selectFooterTemplate(template, windowUsage), stats, usage, windowUsage).trim()
       : [formatTokens(billedInputTokens(usage) + usage.outputTokens) + ' tok',
         hit === null ? null : t('stats.cacheHit', { percent: hit })]
         .filter((part): part is string => part !== null).join(' · ')

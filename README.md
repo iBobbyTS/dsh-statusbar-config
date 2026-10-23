@@ -4,13 +4,14 @@
 
 基于原项目的 Fork，使用 DSH 官方 `conversation.composer.dock` / `usage` Slot 修改**输入框底部累计用量**，不改原生 `activity`（轮数、步数、速度），也不修改每个 Turn 结尾的用量按钮。
 
-默认格式：
+默认显示（按是否发生过成功压缩自动切换）：
 
 ```text
-Session: 70M/1M/130K | Window: 10M/200K/30K
+未压缩：70M/1M/130K
+已压缩：Session: 70M/1M/130K | Window: 10M/200K/30K
 ```
 
-**固定顺序**：缓存读取 / 未缓存输入 / 模型输出。数字为示意值。
+**固定顺序**：缓存读取 / 未缓存输入 / 模型输出。数字为示意值；未压缩时只展示整个 Session 三项计数，压缩成功后才显示 Session 和 Window 双区间。
 
 - **Session**：完整 Session Log 的累计模型调用 Token，直接使用 DSH 的 `tokenUsage`。
 - **Window**：最近一次**成功完成上下文压缩**以后所有 Turn 和调用的累计 Token。它不是最近一个 Turn，也不是当前上下文实际存活 Token 数量。
@@ -46,7 +47,7 @@ Session: ${cacheRead}/${uncachedInput}/${output} | Window: ${windowCacheRead}/${
 
 原默认模板（`↩ 缓存读取 · ↑ 输入 · ↓ 输出`）自动迁移为双统计显示；其他自定义模板保持不变。Window 投影尚未可用时显示 `—`，**不使用 Session 数据冒充 Window**。
 
-点击 Token 用量按钮可查看 Session 和 Window 的精确整数统计，含非零缓存写入。
+点击 Token 用量按钮可查看 Session 和 Window 的精确整数统计，含非零缓存写入。弹窗中的 Window 标题为“当前窗口用量”；它仍表示**本次成功压缩以来的累计计费量**，不等于右侧 ContextMeter 的即时上下文占用量。
 
 ## 上下文占用
 

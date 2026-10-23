@@ -12,9 +12,9 @@
 ## UI
 
 - Only the native `conversation.composer.dock` `usage` item (order 1, priority -1) is overridden. `activity` and per-Turn usage, branching and feedback remain unchanged.
-- Default footer is `Session: R/I/O | Window: R/I/O`; value order is still cache read / uncached input / output.
+- Before any successful compaction, the default footer is `R/I/O` only (Session usage). After one or more successful compactions, it is `Session: R/I/O | Window: R/I/O`. Value order is cache read / uncached input / output. The UI uses `statusbarWindowUsage.compactionCount` to distinguish these states; an absent projection is unknown, not zero. Custom templates are never overridden.
 - When Window projection is absent, show an explicit `—` placeholder. Persisted old default templates are normalized without changing unrelated user preferences.
-- Session and Window exact counts are exposed in the click dialog.
+- Session and Window exact counts are exposed in the click dialog; Window is titled “Current window usage” / “当前窗口用量”, but remains cumulative billed usage of the active compaction epoch.
 - The ContextMeter visible label uses DSH's `contextPressure` and a separate scoped CSS override; it is **not** the Window accumulated usage.
 
 ## Builds and validation

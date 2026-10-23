@@ -1,6 +1,6 @@
 {
   "meta": {
     "title": "Statusbar Enhancement",
-    "description": "Enhances DeepSeek Harness status bar with session and post-compaction token usage."
+    "description": "Enhances DeepSeek Harness status bar with session and current-window token usage."
   }
 }

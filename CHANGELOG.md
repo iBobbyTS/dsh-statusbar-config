@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.3.2 (2026-10-23, iBobbyTS fork)
+
+- Rename the usage popup's “post-compaction window cumulative usage” heading to “Current window usage” / “当前窗口用量”.
+- Hide the Session and Window labels/duplicate Window values in the default footer until the first successful compaction; show only the Session R/I/O counters.
+- Preserve the two-interval footer after compaction, custom templates, and unknown-Window fallback.
+- Synchronize the checked-in Client bundle and regression tests.
+
 ## 0.3.1 (2026-10-23, iBobbyTS fork)
 
 - Remove the leading `↩ /↑/↓ | ` legend from the Session / Window usage footer.

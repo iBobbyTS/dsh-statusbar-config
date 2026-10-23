@@ -4,10 +4,11 @@
 
 This fork replaces only the **Session usage** item through DSH's official `conversation.composer.dock` / `usage` Slot. Native `activity` (turns, steps, throughput) and all completed-Turn usage controls are unchanged.
 
-Default:
+Default footer automatically adapts to compaction history:
 
 ```text
-Session: 70M/1M/130K | Window: 10M/200K/30K
+Never compacted: 70M/1M/130K
+Compacted: Session: 70M/1M/130K | Window: 10M/200K/30K
 ```
 
 The three values in each group are cache-read input / uncached input / output tokens.
@@ -46,7 +47,7 @@ Session: ${cacheRead}/${uncachedInput}/${output} | Window: ${windowCacheRead}/${
 
 Existing users with the previous **default** are migrated automatically at render time; unrelated custom templates remain unchanged. If the Host Window projection has not arrived, the Window values show `—` rather than duplicating Session totals.
 
-Click the session pill for exact count details for both intervals, including nonzero cache writes.
+Click the session pill for exact count details for both intervals, including nonzero cache writes. The dialog labels the second group “Current window usage”; it still means cumulative billing since the latest successful compaction, not instantaneous ContextMeter occupancy.
 
 ## Context occupancy
 
