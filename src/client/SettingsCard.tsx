@@ -1,6 +1,6 @@
 import { useRef, useState, useSyncExternalStore } from 'react'
 import type { SettingsScopeLike } from './runtime.js'
-import { DEFAULT_SETTINGS, type StatusbarSettings } from '../settings.js'
+import { DEFAULT_SETTINGS, resolveUsageTemplate, type StatusbarSettings } from '../settings.js'
 import type { Translate } from './locales.js'
 
 export interface SettingsCardProps {
@@ -9,7 +9,7 @@ export interface SettingsCardProps {
 }
 
 /** Clickable variable chips, most-useful first. */
-const VARIABLES = ['cacheRead', 'uncachedInput', 'cacheWrite', 'output', 'input', 'total', 'cache', 'ttft', 'tps', 'turns', 'steps', 'llm', 'tool'] as const
+const VARIABLES = ['cacheRead', 'uncachedInput', 'output', 'windowCacheRead', 'windowUncachedInput', 'windowOutput', 'cacheWrite', 'windowCacheWrite', 'input', 'total', 'windowTotal', 'cache', 'ttft', 'tps', 'turns', 'steps', 'llm', 'tool'] as const
 
 type Notice = { kind: 'success' | 'error'; text: string } | undefined
 
@@ -26,7 +26,7 @@ export function StatusbarSettingsCard({ settings, t }: SettingsCardProps) {
   const [draft, setDraft] = useState<string | null>(null)
   const inputRef = useRef<HTMLInputElement>(null)
   const stored = snapshot.value ?? DEFAULT_SETTINGS
-  const shown = draft ?? stored.template
+  const shown = draft ?? resolveUsageTemplate(stored.template)
   const writable = snapshot.status === 'ready' && snapshot.writable
 
   const update = async (key: 'enabled' | 'template', next: boolean | string) => {
@@ -68,7 +68,7 @@ export function StatusbarSettingsCard({ settings, t }: SettingsCardProps) {
   const insertVariable = (name: string) => {
     const token = '${' + name + '}'
     const input = inputRef.current
-    const base = draft ?? stored.template
+    const base = draft ?? resolveUsageTemplate(stored.template)
     if (input === null) { setDraft(base + token); return }
     const start = input.selectionStart ?? base.length
     const end = input.selectionEnd ?? base.length

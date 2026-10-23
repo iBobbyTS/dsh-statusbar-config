@@ -1,7 +1,7 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react'
 import type { SettingsScopeLike } from './runtime.js'
-import type { ContextPressureProjection, ConversationNode, SessionStatsProjection, SnapshotSelector, TokenUsageProjection } from './types.js'
-import { DEFAULT_SETTINGS, type StatusbarSettings } from '../settings.js'
+import type { ContextPressureProjection, ConversationNode, SessionStatsProjection, SnapshotSelector, TokenUsageProjection, WindowUsageProjection } from './types.js'
+import { DEFAULT_SETTINGS, resolveUsageTemplate, type StatusbarSettings } from '../settings.js'
 import type { Translate } from './locales.js'
 import { billedInputTokens, cacheHitPercent, contextMeterReading, deriveStats, formatTokens, renderTemplate } from './stats.js'
 
@@ -21,15 +21,16 @@ export function ConfigurableStatsLine({ settings, t, useChat, useProjection }: D
   )
   const settledNodes = useChat(s => s.legacy.nodes)
   const usage = useProjection<TokenUsageProjection>('tokenUsage')
+  const windowUsage = useProjection<WindowUsageProjection>('statusbarWindowUsage')
   const pressure = useProjection<ContextPressureProjection>('contextPressure')
   const projectedStats = useProjection<SessionStatsProjection>('sessionStats')
   const stats = useMemo(() => projectedStats ?? deriveStats(settledNodes ?? []), [projectedStats, settledNodes])
   const value = snapshot.value ?? DEFAULT_SETTINGS
   const hasUsage = usage !== undefined && (billedInputTokens(usage) > 0 || usage.outputTokens > 0)
   const hit = usage === undefined ? null : cacheHitPercent(usage)
-  const template = value.template.trim()
+  const template = resolveUsageTemplate(value.template.trim()).trim()
   const line = !value.enabled || !hasUsage || usage === undefined ? ''
-    : template !== '' ? renderTemplate(template, stats, usage).trim()
+    : template !== '' ? renderTemplate(template, stats, usage, windowUsage).trim()
       : [formatTokens(billedInputTokens(usage) + usage.outputTokens) + ' tok',
         hit === null ? null : t('stats.cacheHit', { percent: hit })]
         .filter((part): part is string => part !== null).join(' · ')
@@ -105,6 +106,18 @@ export function ConfigurableStatsLine({ settings, t, useChat, useProjection }: D
         </>}
         <dt>{t('stats.usageOutput')}</dt><dd>{exact(usage.outputTokens)}</dd>
         <dt>{t('stats.usageCacheHit')}</dt><dd>{hit === null ? '—' : hit + '%'}</dd>
+      </dl>
+      <div className="dsc-usage-heading dsc-usage-window-title">
+        {t('stats.windowTitle')} · {windowUsage === undefined ? '—'
+          : exact(billedInputTokens(windowUsage) + windowUsage.outputTokens) + ' tok'}
+      </div>
+      {windowUsage !== undefined && <dl className="dsc-usage-details">
+        <dt>{t('stats.usageCacheRead')}</dt><dd>{exact(windowUsage.cacheReadTokens)}</dd>
+        <dt>{t('stats.usageUncached')}</dt><dd>{exact(windowUsage.uncachedInputTokens)}</dd>
+        {windowUsage.cacheWriteTokens !== 0 && <>
+          <dt>{t('stats.usageCacheWrite')}</dt><dd>{exact(windowUsage.cacheWriteTokens)}</dd>
+        </>}
+        <dt>{t('stats.usageOutput')}</dt><dd>{exact(windowUsage.outputTokens)}</dd>
       </dl>
     </div>}
   </span>

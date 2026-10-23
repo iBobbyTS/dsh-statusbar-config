@@ -3,7 +3,7 @@
  * math (dsh-client-ui-chat), kept field-compatible with the rc-era plugin so
  * behavior is unchanged when segments are toggled on.
  */
-import type { ConversationNode, SessionStatsProjection, TokenUsageProjection, ContextPressureProjection } from './types.js'
+import type { ConversationNode, SessionStatsProjection, TokenUsageProjection, ContextPressureProjection, WindowUsageProjection } from './types.js'
 import type { StatsTranslate } from './locales.js'
 
 /** Segment selection used only by the default (empty-template) rendering. */
@@ -216,6 +216,7 @@ export function renderTemplate(
   template: string,
   stats: SessionStatsProjection | undefined,
   usage: TokenUsageProjection | undefined,
+  windowUsage?: WindowUsageProjection,
 ): string {
   const values: Record<string, string> = {}
   if (stats !== undefined) {
@@ -235,6 +236,13 @@ export function renderTemplate(
     values.output = formatTokens(usage.outputTokens)
     values.total = formatTokens(billedInputTokens(usage) + usage.outputTokens)
   }
+  // An unavailable Host projection is unknown, never the Session total.
+  values.windowCacheRead = windowUsage === undefined ? '—' : formatTokens(windowUsage.cacheReadTokens)
+  values.windowUncachedInput = windowUsage === undefined ? '—' : formatTokens(windowUsage.uncachedInputTokens)
+  values.windowCacheWrite = windowUsage === undefined ? '—' : formatTokens(windowUsage.cacheWriteTokens)
+  values.windowOutput = windowUsage === undefined ? '—' : formatTokens(windowUsage.outputTokens)
+  values.windowTotal = windowUsage === undefined ? '—'
+    : formatTokens(billedInputTokens(windowUsage) + windowUsage.outputTokens)
   return template.replace(/\$\{([a-zA-Z]+)\}/g, (whole, name: string) => {
     return name in values ? values[name] : whole
   })

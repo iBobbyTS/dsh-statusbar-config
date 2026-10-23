@@ -25,6 +25,10 @@ export interface TokenUsageProjection {
   outputTokens: number
 }
 
+export interface WindowUsageProjection extends TokenUsageProjection {
+  compactionCount: number
+}
+
 /** Approximate provider-anchored context occupancy. */
 export interface ContextPressureProjection {
   pressureTokens?: number
