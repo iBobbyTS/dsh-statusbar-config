@@ -48,7 +48,7 @@ export const styles = `
 .dsc-chip:hover::after,.dsc-chip:focus-visible::after{opacity:1}
 
 /* Session token usage pill in DSH's official `usage` dock entry. */
-.dsc-stats{position:relative;box-sizing:border-box;display:inline-flex;flex:none;width:auto;max-width:min(65vw,800px);min-width:0;margin:0;padding:0;overflow:visible;text-align:left;font-size:12px;line-height:20px}
+.dsc-stats{position:relative;box-sizing:border-box;display:inline-flex;flex:none;width:auto;max-width:min(65vw,800px);min-width:0;margin:0;padding:0;overflow:visible;text-align:left;font-size:calc(var(--dsh-content-font-size-secondary, 13px) - 1px);line-height:calc(20px + var(--dsh-content-font-delta-secondary, 0px))}
 .dsc-stats-trigger{display:inline-flex;align-items:center;gap:6px;box-sizing:border-box;max-width:100%;min-width:0;padding:1px 8px;border:0;border-radius:var(--dsw-radius-sm);background:transparent;color:var(--dsw-alias-label-tertiary);font:inherit;line-height:inherit;white-space:nowrap;cursor:pointer}
 .dsc-stats-trigger:hover,.dsc-stats-trigger[aria-expanded=true]{background:var(--dsw-alias-interactive-bg-hover);color:var(--dsw-alias-label-secondary)}
 .dsc-stats-trigger:focus-visible{outline:2px solid var(--dsw-alias-brand-primary);outline-offset:2px}
