@@ -39,7 +39,7 @@ dsh plugin --profile desktop add github:iBobbyTS/dsh-statusbar-config
 
 ## 上下文窗口
 
-原生 `14%` 的可见文字改成类似 `≈38K / 200K`，根据 `contextPressure.projectedTokens`（或 `pressureTokens`）与 `contextWindow` 显示。**这是近似的当前上下文使用量，不是累计 Token 用量。** 保留官方圆环、弹窗、Tooltip 和无障碍百分比描述。
+原生 `14%` 的可见文字改成类似 `38K / 200K`，根据 `contextPressure.projectedTokens`（或 `pressureTokens`）与 `contextWindow` 显示。**这是近似的当前上下文使用量，不是累计 Token 用量。** 保留官方圆环、弹窗、Tooltip 和无障碍百分比描述。
 
 上下文组件目前缺少独立可替换的 Slot，因此本功能采用局部 CSS 适配，后续 DSH 更新可能需要调整。
 

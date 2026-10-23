@@ -14,10 +14,10 @@ describe('session usage footer', () => {
   })
   it('uses the projected context after compaction', () => {
     expect(contextMeterReading({ projectedTokens: 38_400, pressureTokens: 100_000, contextWindow: 200_000 }))
-      .toBe('≈38.4K / 200K')
+      .toBe('38.4K / 200K')
   })
   it('falls back and avoids fabricated counts', () => {
-    expect(contextMeterReading({ pressureTokens: 30_000, contextWindow: 200_000 })).toBe('≈30K / 200K')
+    expect(contextMeterReading({ pressureTokens: 30_000, contextWindow: 200_000 })).toBe('30K / 200K')
     expect(contextMeterReading(undefined)).toBeNull()
     expect(contextMeterReading({ contextWindow: 200_000 })).toBeNull()
     expect(contextMeterReading({ projectedTokens: 1_000, contextWindow: 0 })).toBeNull()

@@ -39,7 +39,7 @@ An empty template shows session total and cache hit; unknown variables remain vi
 
 ## Context
 
-The native percent's visible text is overlaid with an approximate `≈used / capacity` reading, using `contextPressure.projectedTokens` (fallback `pressureTokens`) and `contextWindow`. This is **not cumulative session usage**. Its native ring, popup, tooltip and percentage-based accessibility label remain intact.
+The native percent's visible text is overlaid with an approximate `used / capacity` reading, using `contextPressure.projectedTokens` (fallback `pressureTokens`) and `contextWindow`. This is **not cumulative session usage**. Its native ring, popup, tooltip and percentage-based accessibility label remain intact.
 
 DSH has no dedicated ContextMeter replacement Slot, so the context label uses a scoped CSS override that may need updating with newer DSH DOM versions.
 

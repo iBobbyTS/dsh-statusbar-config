@@ -209,7 +209,7 @@ export function contextMeterReading(pressure: ContextPressureProjection | undefi
   const capacity = pressure?.contextWindow
   if (used === undefined || capacity === undefined || !Number.isFinite(used)
       || !Number.isFinite(capacity) || used < 0 || capacity <= 0) return null
-  return '≈' + formatTokens(used) + ' / ' + formatTokens(capacity)
+  return formatTokens(used) + ' / ' + formatTokens(capacity)
 }
 
 export function renderTemplate(
