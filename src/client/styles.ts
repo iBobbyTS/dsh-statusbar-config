@@ -56,6 +56,7 @@ export const styles = `
 .dsc-stats-label{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-variant-numeric:tabular-nums}
 .dsc-usage-panel{position:absolute;bottom:calc(100% + 8px);right:0;z-index:1100;box-sizing:border-box;width:min(270px,calc(100vw - 24px));padding:12px;border:1px solid var(--dsw-alias-border-l1);border-radius:var(--dsw-radius-lg);background:var(--dsw-specific-menu);color:var(--dsw-alias-label-secondary);box-shadow:var(--dsw-elevation-prominent);font-size:12px;line-height:20px;white-space:normal;text-align:left}
 .dsc-usage-heading{margin-bottom:8px;padding-bottom:8px;border-bottom:1px solid var(--dsw-alias-border-l2);font-weight:600;color:var(--dsw-alias-label-primary)}
+.dsc-usage-window-title{margin-top:12px}
 .dsc-usage-details{display:grid;grid-template-columns:minmax(0,1fr) max-content;gap:4px 10px;margin:0;font-variant-numeric:tabular-nums}
 .dsc-usage-details dt,.dsc-usage-details dd{margin:0}
 .dsc-usage-details dd{color:var(--dsw-alias-label-primary);text-align:right}
