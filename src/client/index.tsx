@@ -1,7 +1,8 @@
 /**
  * Browser half: shadow the shipped `conversation.composer.dock` entry with
- * id `usage` (lower priority wins the cell) and contribute the settings card
- * on this bundle's page in the Plugins section (`plugins.bundle.config`).
+ * id `usage` (lower priority wins the cell), relabel completed-Turn usage, and
+ * contribute the settings card on this bundle's page in the Plugins section
+ * (`plugins.bundle.config`).
  */
 import type { ClientContextLike } from './runtime.js'
 import type { StatusbarSettings } from '../settings.js'
@@ -9,6 +10,7 @@ import { StatusbarSettingsCard } from './SettingsCard.js'
 import { LOCALE_NAMESPACE, en, zh } from './locales.js'
 import { ConfigurableStatsLine } from './StatsLine.js'
 import { STYLE_ID, styles } from './styles.js'
+import { TurnUsageLabel } from './TurnUsageLabel.js'
 
 const PLUGIN_ID = 'dsh-statusbar-config'
 
@@ -50,4 +52,12 @@ export function apply(ctx: ClientContextLike): void {
     locale: LOCALE_NAMESPACE,
     inject: () => ({ settings }) as Record<string, unknown>,
   }, ConfigurableStatsLine))
+
+  // No per-Turn usage Slot exists in DSH: this null-rendering entry publishes
+  // the Turn's counters on its Turn-tail root for the scoped CSS override.
+  ctx.slots.inject('conversation.chat.turnTail', () => ctx.slots.register({
+    name: 'conversation.chat.turnTail',
+    id: 'turn-usage-label',
+    order: 0,
+  }, TurnUsageLabel))
 }

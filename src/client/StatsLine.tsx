@@ -118,7 +118,7 @@ export function ConfigurableStatsLine({ settings, t, useChat, useProjection }: D
           <dt>{t('stats.usageCacheWrite')}</dt><dd>{exact(windowUsage.cacheWriteTokens)}</dd>
         </>}
         <dt>{t('stats.usageOutput')}</dt><dd>{exact(windowUsage.outputTokens)}</dd>
-      </dl>
+      </dl>}
     </div>}
   </span>
 }

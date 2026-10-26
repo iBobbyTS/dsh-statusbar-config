@@ -2,7 +2,7 @@
 
 [English](README.en.md) · [原仓库 MannixHu/dsh-statusbar-config](https://github.com/MannixHu/dsh-statusbar-config) · MIT
 
-基于原项目的 Fork，使用 DSH 官方 `conversation.composer.dock` / `usage` Slot 修改**输入框底部累计用量**，不改原生 `activity`（轮数、步数、速度），也不修改每个 Turn 结尾的用量按钮。
+基于原项目的 Fork，使用 DSH 官方 `conversation.composer.dock` / `usage` Slot 修改**输入框底部累计用量**，不改原生 `activity`（轮数、步数、速度）；Turn 结尾的用量胶囊改成同一套 `缓存读取/未缓存输入/输出` 紧凑格式，位置、图标、点击弹窗与窄屏收起行为保持原生。
 
 默认显示（按是否发生过成功压缩自动切换）：
 
@@ -52,6 +52,20 @@ Session: ${cacheRead}/${uncachedInput}/${output} | Window: ${windowCacheRead}/${
 ## 上下文占用
 
 右侧原生 ContextMeter 的可见百分比仍按之前版本替换为 `已用 / 容量`，保留官方圆环、Tooltip 与弹窗。它来自 `contextPressure`，**与 Window 的累计计费量不同**。因 DSH 暂无专用 ContextMeter Slot，仍采用局部 CSS 适配。
+
+## Turn 用量
+
+每个 Turn 结尾的用量胶囊显示本轮自己的三项计数，顺序与输入框下方一致：
+
+```text
+9.2M/96.1K/56.1K
+```
+
+- 始终生效，没有独立开关。数据库图标、悬停底色、点击打开的官方「本轮用量」明细弹窗（含精确整数、缓存命中率、提供方/模型）以及 <480px 窄屏只留图标的行为全部沿用原生。
+- 固定使用紧凑三项格式，不读取上面的自定义模板。
+- 数据取该 Turn 的 `turn-tail` 节点 `tokenUsage`（缓存读取 / 未缓存输入 / 输出），不重新计算计费。
+- 若提供方从未上报缓存读取，胶囊保留原生 `用量 x tok`，不伪造 `0`。
+- 实现说明：dsh 0.2.1 没有 per-Turn 用量 Slot，原生胶囊硬编码在 `TurnTailNodeView` 内。插件注册一个**渲染为空**的 `conversation.chat.turnTail` 条目，把本轮数值写到 Turn 尾巴根节点，再用局部 CSS 隐藏原生文案并显示三项计数。替换整体 `turn-tail` 渲染器（`shadows-shipped-ui`）会连带重写复制/分支/反馈/时钟，因此不采用。
 
 ## 开发与验证
 

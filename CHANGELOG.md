@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.3.3 (2026-10-26, iBobbyTS fork)
+
+- Show each completed Turn's usage pill as `缓存读取/未缓存输入/输出` (e.g. `9.2M/96.1K/56.1K`), matching the composer footer; the shipped icon, hover, click-open “Turn usage” dialog and the <480px icon-only collapse are reused.
+- Publish the label from a null-rendering `conversation.chat.turnTail` entry and rewrite the shipped text with a scoped CSS override, because dsh 0.2.1 exposes no per-Turn usage Slot and replacing the whole `turn-tail` renderer would re-own copy/branch/feedback/clock. The label is always on; a provider that never reports cache reads keeps the native `usage x tok`.
+- Add per-Turn label tests and rebuild the checked-in Client bundle.
+- Repair the checked-in source so `pnpm typecheck`/`pnpm build` pass again: the usage dialog's Window block was missing its closing brace, and the stylesheet comment contained backticks that terminated the CSS template literal.
+
 ## 0.3.2 (2026-10-23, iBobbyTS fork)
 
 - Rename the usage popup's “post-compaction window cumulative usage” heading to “Current window usage” / “当前窗口用量”.

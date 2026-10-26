@@ -2,7 +2,7 @@
 
 [中文](README.md) · [Original MannixHu/dsh-statusbar-config](https://github.com/MannixHu/dsh-statusbar-config) · MIT
 
-This fork replaces only the **Session usage** item through DSH's official `conversation.composer.dock` / `usage` Slot. Native `activity` (turns, steps, throughput) and all completed-Turn usage controls are unchanged.
+This fork replaces the **Session usage** item through DSH's official `conversation.composer.dock` / `usage` Slot, and shows the completed-Turn usage pill as the same `cache-read/uncached-input/output` counters. Native `activity` (turns, steps, throughput) is unchanged, and the Turn pill keeps its shipped position, icon, click-open dialog and narrow-viewport collapse.
 
 Default footer automatically adapts to compaction history:
 
@@ -52,6 +52,20 @@ Click the session pill for exact count details for both intervals, including non
 ## Context occupancy
 
 The separate native ContextMeter continues to show `used / capacity` instead of percent as a visible label. This uses `contextPressure` and is independent of the post-compaction billed totals. Native ring and dialog remain intact; since DSH has no ContextMeter Slot, the visible label uses a scoped CSS compatibility override.
+
+## Turn usage
+
+Each completed Turn's usage pill shows that Turn's own counters, in the same order as the composer footer:
+
+```text
+9.2M/96.1K/56.1K
+```
+
+- Always on; there is no separate toggle. The database icon, hover background, the native “Turn usage” click dialog (exact integers, cache-hit percent, provider/model) and the shipped icon-only collapse below 480px all stay.
+- It always uses this compact three-counter form and ignores the custom template above.
+- Values come from that Turn's `turn-tail` Chat node `tokenUsage` (cache read / uncached input / output); no billing is recomputed.
+- When the provider never reported cache reads, the pill keeps DSH's native `Usage x tok` instead of inventing a `0`.
+- Implementation: dsh 0.2.1 exposes no per-Turn usage Slot — the pill is built inside `TurnTailNodeView`. The plugin registers a **null-rendering** `conversation.chat.turnTail` entry that publishes the Turn's counters on the Turn-tail root, and a scoped CSS override hides the shipped text and renders the three counters. Replacing the whole `turn-tail` renderer (`shadows-shipped-ui`) would re-own copy/branch/feedback/clock, so it is not used.
 
 ## Development
 

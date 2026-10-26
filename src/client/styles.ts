@@ -47,7 +47,7 @@ export const styles = `
 .dsc-chip::after{content:attr(data-tip);position:absolute;top:calc(100% + 6px);left:var(--tip-left,0px);transform:none;width:max-content;max-width:min(320px,80vw);box-sizing:border-box;background:var(--dsw-alias-bg-layer-3);color:var(--dsw-alias-label-primary);border:1px solid var(--dsw-alias-border-l2);border-radius:8px;padding:6px 10px;font-size:12px;line-height:1.5;white-space:normal;text-align:left;box-shadow:var(--dsw-shadow-lv1);opacity:0;pointer-events:none;transition:opacity .12s;z-index:5}
 .dsc-chip:hover::after,.dsc-chip:focus-visible::after{opacity:1}
 
-/* Session token usage pill in DSH's official `usage` dock entry. */
+/* Session token usage pill in DSH's official 'usage' dock entry. */
 .dsc-stats{position:relative;box-sizing:border-box;display:inline-flex;flex:none;width:auto;max-width:min(65vw,800px);min-width:0;margin:0;padding:0;overflow:visible;text-align:left;font-size:calc(var(--dsh-content-font-size-secondary, 13px) - 1px);line-height:calc(20px + var(--dsh-content-font-delta-secondary, 0px))}
 .dsc-stats-trigger{display:inline-flex;align-items:center;gap:6px;box-sizing:border-box;max-width:100%;min-width:0;padding:1px 8px;border:0;border-radius:var(--dsw-radius-sm);background:transparent;color:var(--dsw-alias-label-tertiary);font:inherit;line-height:inherit;white-space:nowrap;cursor:pointer}
 .dsc-stats-trigger:hover,.dsc-stats-trigger[aria-expanded=true]{background:var(--dsw-alias-interactive-bg-hover);color:var(--dsw-alias-label-secondary)}
@@ -64,5 +64,13 @@ export const styles = `
 [data-composer-dock][data-dsc-context-meter=true] > span:last-child button[aria-haspopup=dialog] > span{display:none}
 [data-composer-dock][data-dsc-context-meter=true] > span:last-child button[aria-haspopup=dialog]::after{content:var(--dsc-context-meter-label);font-variant-numeric:tabular-nums;white-space:nowrap}
 @media(max-width:700px){.dsc-stats{max-width:42vw}.dsc-stats-trigger{padding-inline:3px}[data-composer-dock][data-dsc-context-meter=true] > span:last-child button[aria-haspopup=dialog]{padding-inline:3px}}
+
+/* Completed-Turn usage pill: the TurnUsageLabel entry puts the R/I/O counters on
+   the Turn-tail root, and this replaces the shipped "usage <total> tok" text.
+   DSH has no per-Turn usage Slot; the pill's icon, hover, click dialog and its
+   narrow-viewport icon-only collapse remain the shipped ones. */
+[data-turn-tail][data-dsc-turn-usage=true] button[aria-haspopup=dialog] > span:last-child{display:none}
+[data-turn-tail][data-dsc-turn-usage=true] button[aria-haspopup=dialog]::after{content:var(--dsc-turn-usage-label);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-variant-numeric:tabular-nums}
+@media(max-width:480px){[data-turn-tail][data-dsc-turn-usage=true] button[aria-haspopup=dialog]::after{display:none}}
 
 `
