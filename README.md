@@ -76,4 +76,6 @@ pnpm check
 
 `lib/` 是随仓库提交的预构建 Host 和 Client 入口，安装时无需执行构建。源码位于 `src/`；更新源码后需同步更新产物。详见 [SESSION_FOOTER.md](SESSION_FOOTER.md)。
 
+配置页表单由 dsh 的 settings 服务从 Host `Config` schema 投影而来，只有标了 `.volatile()` 的字段才会出现在 `settings/describe` 里；漏标时整个 namespace 不可用，插件页的模板编辑器会显示“状态栏设置命名空间不可用”并禁用全部控件。保存的值写入 profile 的 `cordis.patch.yml`，Loader 随即以新 config 重新施加本插件。
+
 原作者 MannixHu，原项目使用 MIT 许可证；Fork 保留其许可与署名。

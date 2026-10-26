@@ -76,4 +76,6 @@ pnpm check
 
 Keep checked-in `lib/` (Host and Client) synchronized with `src/` for no-build Git plugin installation. See [SESSION_FOOTER.md](SESSION_FOOTER.md).
 
+The configuration page is projected by dsh's settings service from the Host `Config` schema: only fields marked `.volatile()` reach `settings/describe`. Without the flag the whole namespace is unavailable and the template editor renders “settings namespace unavailable” with every control disabled. Saved values land in the profile's `cordis.patch.yml`, and the Loader re-applies this plugin with the new config.
+
 MIT license; original author MannixHu.

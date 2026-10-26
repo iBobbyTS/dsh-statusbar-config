@@ -1,6 +1,6 @@
 {
   "name": "dsh-statusbar-config",
-  "version": "0.3.3",
+  "version": "0.3.4",
   "description": "Session, post-compaction Window and per-Turn token usage for DeepSeek Harness",
   "type": "module",
   "main": "lib/index.js",
@@ -55,7 +55,7 @@
     "dsh": ">=0.1.7-0"
   },
   "peerDependencies": {
-    "@deepseek-ai/schemastery": "^3.18.2",
+    "@deepseek-ai/schemastery": "^3.18.5",
     "react": "^18.3.1"
   },
   "peerDependenciesMeta": {
@@ -69,7 +69,7 @@
   "devDependencies": {
     "@deepseek-ai/cordis": "^4.0.2",
     "@deepseek-ai/dsh-settings": "^0.1.2-alpha.4",
-    "@deepseek-ai/schemastery": "^3.18.2",
+    "@deepseek-ai/schemastery": "^3.18.5",
     "@types/node": "^22.15.0",
     "@types/react": "~18.3.1",
     "react": "^18.3.1",

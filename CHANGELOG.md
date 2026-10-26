@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.3.4 (2026-10-26, iBobbyTS fork)
+
+- Re-open the Plugins-page template editor: the Host `Config` now marks `enabled` and `template` volatile. dsh 0.1.7+ projects only volatile fields into a settings namespace, so without the flag `dsh-statusbar-config` was absent from `settings/describe` altogether — the card reported “settings namespace unavailable” and kept the input, the variable chips and the reset button disabled.
+- Drop the obsolete `settings.register(...)` call from the Host half: dsh derives the form from the exported `Config` schema and writes into the profile patch, and that method no longer exists.
+- Remove the vestigial `status-bar-config` namespace constant and pin the schema contract (volatile flags, shipped defaults, textarea role) with a regression test.
+- Bump `@deepseek-ai/schemastery` to 3.18.5, the dsh fork that provides `.volatile()`.
+
 ## 0.3.3 (2026-10-26, iBobbyTS fork)
 
 - Show each completed Turn's usage pill as `缓存读取/未缓存输入/输出` (e.g. `9.2M/96.1K/56.1K`), matching the composer footer; the shipped icon, hover, click-open “Turn usage” dialog and the <480px icon-only collapse are reused.

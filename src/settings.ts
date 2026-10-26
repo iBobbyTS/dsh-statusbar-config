@@ -1,12 +1,11 @@
 /**
- * Shared settings contract between the Host half (namespace registration)
- * and the browser half (scope binding + card).
+ * Shared settings contract between the Host half (Config schema) and the
+ * browser half (configuration form + card).
  *
- * The namespace deliberately reuses the historical `status-bar-config` value
- * so pre-template sections in `~/.dsh/settings.yaml` keep loading (unknown
- * legacy keys are ignored).
+ * dsh keys settings by Loader entry id (`dsh-statusbar-config`), so the
+ * pre-0.1.7 `status-bar-config` section of `~/.dsh/settings.yaml` is no
+ * longer read; only the field shape below is shared.
  */
-export const SETTINGS_NAMESPACE_VALUE = 'status-bar-config'
 export const PREVIOUS_DEFAULT_TEMPLATE = "↩ ${cacheRead} · ↑ ${uncachedInput} · ↓ ${output}"
 /** Saved defaults from version 0.3.0 (and a spacing variant). */
 export const LEGACY_DUAL_DEFAULT_TEMPLATE = "↩ /↑/↓ | Session: ${cacheRead}/${uncachedInput}/${output} | Window: ${windowCacheRead}/${windowUncachedInput}/${windowOutput}"
