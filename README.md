@@ -67,6 +67,37 @@ Session: ${cacheRead}/${uncachedInput}/${output} | Window: ${windowCacheRead}/${
 - 若提供方从未上报缓存读取，胶囊保留原生 `用量 x tok`，不伪造 `0`。
 - 实现说明：dsh 0.2.1 没有 per-Turn 用量 Slot，原生胶囊硬编码在 `TurnTailNodeView` 内。插件注册一个**渲染为空**的 `conversation.chat.turnTail` 条目，把本轮数值写到 Turn 尾巴根节点，再用局部 CSS 隐藏原生文案并显示三项计数。替换整体 `turn-tail` 渲染器（`shadows-shipped-ui`）会连带重写复制/分支/反馈/时钟，因此不采用。
 
+## 压缩标记
+
+上下文压缩完成后，对话里的压缩标记原本显示被替换历史的估算体积：
+
+```text
+compact · 已压缩 709 条历史记录（约 413235 tokens）
+```
+
+现在改为这次摘要调用自己的用量：
+
+```text
+compact · 173K→2.4K tokens
+```
+
+- 箭头左边是**所有输入之和**（未缓存输入 + 缓存读取 + 缓存写入），右边是摘要输出 Token，单位与输入框下方一致（K/M）。
+- 数据来自 `compaction/summary` 事件的 `usage`。官方 Chat 节点只保留被替换历史的条数与估算 Token，会丢掉这个字段，因此由 `statusbarCompactionUsage` Host Projection 保留，并按标记上仍打印的「条数 / 估算 Token」两项与对应记录匹配。
+- 只替换那一行摘要文字：上下文图标、悬停才出现的展开箭头、可展开的 Markdown 摘要、吸顶标题全部沿用官方实现。
+- 摘要调用没有上报用量，或标记显示的是兜底文案时，保持官方原文。
+- 标记也可能在投影到达**之后**才挂载（恢复会话、往回滚动加载历史、行被重建）。因此插件监听对话区的 DOM 变化，而不是在固定的一次/300ms 后补一遍：晚挂载的行一出现就打标记，连「先建行、稍后才填入文字」的情况也能补上。
+- 摘要调用本来就不计入 Session `tokenUsage` 和 Window 区间；这里只是把它显示在标记上，不改变任何累计值。
+
+## 压缩后的操作行
+
+配合 [`@local/dsh-fork-after-compaction`](../dsh-fork-after-compaction) 时，每条压缩标记下方的操作行也由本插件统一格式：
+
+- 行动作复刻官方 Turn 结尾那一行（复制 / 分支 / 用量 / 时间，不带点赞点踩），分支按钮从这次压缩结束处 fork。
+- 行用自己的数据库图标与「缓存读取 / 未缓存输入 / 输出」三个计数；本插件读取该行公布的三个原始计数，用与 Turn 胶囊完全相同的格式化函数改写文案，因此两处永远一致。
+- 集成契约：操作行在用量元素上带 `data-dfac-usage` 与 `data-dfac-cache-read` / `data-dfac-uncached-input` / `data-dfac-output`，并在挂载时向 `document` 冒泡派发 `dsh-fork-row-usage` 事件；本插件在挂载时扫描一次并监听该事件。未安装本插件时该行显示自己的兜底文案，不影响分叉。
+- 只替换文案：数据库图标、窄屏只留图标的行为仍由操作行负责。
+
+
 ## 开发与验证
 
 ```bash

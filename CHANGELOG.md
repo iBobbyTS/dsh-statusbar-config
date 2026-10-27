@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.4.0 (2026-10-26, iBobbyTS fork)
+
+- Label each compaction marker with the summarization call's own usage: `compact · 已压缩 709 条历史记录（约 413235 tokens）` now reads `compact · 173K→2.4K tokens` — all prompt input summed (uncached + cache read + cache write) → summary output.
+- Add the `statusbarCompactionUsage` Host Session Projection. `compaction/summary` carries the summarizer's provider-reported `usage`, but the Chat node built from it drops the field; the projection keeps that usage next to the two replaced-history counts the marker prints.
+- Swap only the marker's summary text from the always-mounted composer-dock entry, with a scoped CSS override: the shipped context icon, hover disclosure, expandable Markdown summary and pinned header stay native. Markers without reported summarizer usage keep the shipped text.
+- Patch markers a transcript mounts later too: the dock observes the transcript's DOM (coalesced to one frame per burst) instead of running a single deferred pass, so a restored session, a scrolled-back history window or a re-created row is labelled whenever it appears — including when its summary text arrives in a later update. Unrelated mutations cost one failed `querySelector` on the inserted subtree.
+- Cover the fold (idempotent replay, all input buckets, malformed payloads) and the Client matching/label formatting with tests, and rebuild the checked-in Host and Client bundles.
+
 ## 0.3.4 (2026-10-26, iBobbyTS fork)
 
 - Re-open the Plugins-page template editor: the Host `Config` now marks `enabled` and `template` volatile. dsh 0.1.7+ projects only volatile fields into a settings namespace, so without the flag `dsh-statusbar-config` was absent from `settings/describe` altogether — the card reported “settings namespace unavailable” and kept the input, the variable chips and the reset button disabled.

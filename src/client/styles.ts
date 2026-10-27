@@ -73,4 +73,20 @@ export const styles = `
 [data-turn-tail][data-dsc-turn-usage=true] button[aria-haspopup=dialog]::after{content:var(--dsc-turn-usage-label);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-variant-numeric:tabular-nums}
 @media(max-width:480px){[data-turn-tail][data-dsc-turn-usage=true] button[aria-haspopup=dialog]::after{display:none}}
 
+/* Compaction marker: the shipped row keeps its icon, hover disclosure,
+   expandable summary and pinned header; only the summary text changes, from the
+   estimated replaced-history size to the summarization call's 输入合计→输出.
+   The decorator publishes the label on the row's button, the last span is the
+   shipped summary, and the pseudo-element inherits the button's color. */
+[data-dsc-compaction-label=true] > span:last-child{display:none}
+[data-dsc-compaction-label=true]::after{content:var(--dsc-compaction-label);flex:1 1 auto;min-width:0;overflow:hidden;color:inherit;font-size:var(--dsh-content-font-size-secondary,13px);line-height:calc(24px + var(--dsh-content-font-delta,0px));white-space:nowrap;text-overflow:ellipsis;font-variant-numeric:tabular-nums}
+
+/* Compaction Fork row (dsh-fork-after-compaction): the row publishes its
+   summarizer buckets on a data-dfac-usage pill, and this replaces the row's
+   fallback R/I/O text with the same label the Turn pill gets. The pill's
+   database glyph and narrow-viewport icon-only collapse stay the row's. */
+[data-dfac-usage][data-dsc-fork-row-usage=true] [data-dfac-usage-label]{display:none}
+[data-dfac-usage][data-dsc-fork-row-usage=true]::after{content:var(--dsc-fork-row-usage-label);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-variant-numeric:tabular-nums}
+@media(max-width:480px){[data-dfac-usage][data-dsc-fork-row-usage=true]::after{display:none}}
+
 `

@@ -4,6 +4,8 @@ import type { ContextPressureProjection, ConversationNode, SessionStatsProjectio
 import { DEFAULT_SETTINGS, resolveUsageTemplate, type StatusbarSettings } from '../settings.js'
 import type { Translate } from './locales.js'
 import { billedInputTokens, cacheHitPercent, contextMeterReading, deriveStats, formatTokens, renderTemplate, selectFooterTemplate } from './stats.js'
+import { useCompactionLabelPatch } from './compaction-label.js'
+import { useForkRowUsagePatch } from './fork-row-usage.js'
 
 export interface DockProps {
   settings: SettingsScopeLike<StatusbarSettings>
@@ -19,6 +21,12 @@ export function ConfigurableStatsLine({ settings, t, useChat, useProjection }: D
     () => settings.getSnapshot(),
     () => settings.getSnapshot(),
   )
+  // Always on: labelling the compaction markers is independent of this row's
+  // own visibility and of the `enabled` setting.
+  useCompactionLabelPatch(useProjection)
+  // The Compaction Fork row publishes its own buckets; this replaces its usage
+  // text with the same format as the Turn pill.
+  useForkRowUsagePatch()
   const settledNodes = useChat(s => s.legacy.nodes)
   const usage = useProjection<TokenUsageProjection>('tokenUsage')
   const windowUsage = useProjection<WindowUsageProjection>('statusbarWindowUsage')

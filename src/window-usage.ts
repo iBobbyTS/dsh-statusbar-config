@@ -3,13 +3,7 @@
  * The Session cumulative usage continues to come from DSH's tokenUsage.
  */
 import { z } from 'zod'
-
-const bucketsSchema = z.object({
-  uncachedInputTokens: z.number().int().nonnegative(),
-  cacheReadTokens: z.number().int().nonnegative(),
-  cacheWriteTokens: z.number().int().nonnegative(),
-  outputTokens: z.number().int().nonnegative(),
-}).strict()
+import { asRecord, bucketsFrom, bucketsSchema, isCount, type TokenBuckets } from './usage-buckets.js'
 
 const viewSchema = bucketsSchema.extend({
   compactionCount: z.number().int().nonnegative(),
@@ -24,7 +18,6 @@ const stateSchema = z.object({
   }).nullable(),
 }).strict()
 
-export type TokenBuckets = z.infer<typeof bucketsSchema>
 export type WindowUsageView = z.infer<typeof viewSchema>
 export type WindowUsageState = z.infer<typeof stateSchema>
 
@@ -34,28 +27,6 @@ function emptyBuckets(): TokenBuckets {
 
 export function initialWindowUsage(): WindowUsageState {
   return { window: { ...emptyBuckets(), compactionCount: 0 }, last: null }
-}
-
-function asRecord(value: unknown): Record<string, unknown> | undefined {
-  return value !== null && typeof value === 'object' && !Array.isArray(value)
-    ? value as Record<string, unknown> : undefined
-}
-
-function isCount(value: unknown): value is number {
-  return typeof value === 'number' && Number.isSafeInteger(value) && value >= 0
-}
-
-function bucketsFrom(raw: unknown): TokenBuckets | undefined {
-  const usage = asRecord(raw)
-  if (!usage || !isCount(usage.inputTokens) || !isCount(usage.outputTokens)) return
-  if (usage.cacheReadTokens !== undefined && !isCount(usage.cacheReadTokens)) return
-  if (usage.cacheWriteTokens !== undefined && !isCount(usage.cacheWriteTokens)) return
-  return {
-    uncachedInputTokens: usage.inputTokens,
-    cacheReadTokens: usage.cacheReadTokens ?? 0,
-    cacheWriteTokens: usage.cacheWriteTokens ?? 0,
-    outputTokens: usage.outputTokens,
-  }
 }
 
 /** Match token-meter's assistant/message authority and compact stream reader. */
@@ -138,11 +109,24 @@ export const windowUsageProjectionDefinition = {
   },
 }
 
+/**
+ * The registration shape this plugin's Host units use. Structural on purpose:
+ * the Host half must not import DSH's Session Projection package at runtime.
+ */
+export interface SessionProjectionRegistration {
+  readonly key: string
+  readonly stateVersion: number
+  readonly stateSchema: unknown
+  readonly init: (...args: never[]) => unknown
+  readonly apply: (...args: never[]) => unknown
+  readonly wire: unknown
+}
+
 /** Local typed Cordis service seam, without a runtime import from DSH internals. */
 declare module '@deepseek-ai/cordis' {
   interface Context {
     sessionProjections: {
-      register(definition: typeof windowUsageProjectionDefinition): Promise<unknown>
+      register(definition: SessionProjectionRegistration): Promise<unknown>
     }
   }
 }

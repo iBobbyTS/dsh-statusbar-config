@@ -1,7 +1,8 @@
 {
   "name": "dsh-statusbar-config",
-  "version": "0.3.4",
+  "version": "0.4.0",
   "description": "Session, post-compaction Window and per-Turn token usage for DeepSeek Harness",
+  "icon": "./icon.svg",
   "type": "module",
   "main": "lib/index.js",
   "exports": {
@@ -19,7 +20,8 @@
     "README.md",
     "README.en.md",
     "LICENSE",
-    "locale/*.json"
+    "locale/*.json",
+    "icon.svg"
   ],
   "dsh": {
     "bundle": {

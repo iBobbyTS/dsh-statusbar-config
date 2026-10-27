@@ -67,6 +67,37 @@ Each completed Turn's usage pill shows that Turn's own counters, in the same ord
 - When the provider never reported cache reads, the pill keeps DSH's native `Usage x tok` instead of inventing a `0`.
 - Implementation: dsh 0.2.1 exposes no per-Turn usage Slot — the pill is built inside `TurnTailNodeView`. The plugin registers a **null-rendering** `conversation.chat.turnTail` entry that publishes the Turn's counters on the Turn-tail root, and a scoped CSS override hides the shipped text and renders the three counters. Replacing the whole `turn-tail` renderer (`shadows-shipped-ui`) would re-own copy/branch/feedback/clock, so it is not used.
 
+## Compaction marker
+
+A landed compaction marker used to print the estimated size of the replaced history:
+
+```text
+Compacted 709 history items (~413235 tokens)
+```
+
+It now labels that row with the summarization call's own usage:
+
+```text
+173K→2.4K tokens
+```
+
+- The left side is **all prompt input summed** (uncached input + cache read + cache write); the right side is the summary output, in the same K/M units as the composer footer.
+- The values come from `compaction/summary`'s `usage`. The shipped Chat node keeps only the replaced-history item and token counts and drops that field, so the `statusbarCompactionUsage` Host projection preserves it and matches each rendered marker by the two counts the marker still prints.
+- Only that summary text is replaced: the context icon, the hover disclosure arrow, the expandable Markdown summary and the pinned header all stay native.
+- A marker whose summarization usage was not reported, or that shows a fallback string, keeps the shipped text.
+- The row can also mount *after* the projection arrives (restored session, scrolled-back history, a row the transcript re-creates), so the plugin watches the transcript's DOM instead of patching once on a timer: a late row is labelled as soon as it appears, including when its text is filled in a later update.
+- Summarizer calls were never part of the Session `tokenUsage` or the Window epoch; this only displays them on the marker and changes no running total.
+
+## Compaction row
+
+Together with [`@local/dsh-fork-after-compaction`](../dsh-fork-after-compaction), the action row under each compaction marker is formatted by this plugin too:
+
+- The row mirrors the shipped completed-Turn action row (copy / branch / usage / clock, without the feedback thumbs); its branch forks at that compaction's end.
+- The row owns its database glyph and the three counters; this plugin reads the raw buckets the row publishes and rewrites the text with the same formatter as the Turn pill, so both placements stay identical.
+- Integration contract: the row carries `data-dfac-usage` plus `data-dfac-cache-read` / `data-dfac-uncached-input` / `data-dfac-output` on its usage pill and dispatches a bubbling `dsh-fork-row-usage` event on mount; this plugin scans once on mount and listens for that event. Without this plugin the row shows its own fallback label and still forks.
+- Only the text is replaced: the glyph and the narrow-viewport icon-only collapse stay with the row.
+
+
 ## Development
 
 ```bash

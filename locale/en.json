@@ -1,6 +1,6 @@
 {
   "meta": {
     "title": "Statusbar Enhancement",
-    "description": "Enhances DeepSeek Harness status bar with session and current-window token usage."
+    "description": "Shows session and current-window token usage below the DSH composer, and labels completed turns with cache-read/uncached-input/output counters."
   }
 }

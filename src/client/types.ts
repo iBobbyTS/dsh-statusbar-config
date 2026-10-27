@@ -29,6 +29,20 @@ export interface WindowUsageProjection extends TokenUsageProjection {
   compactionCount: number
 }
 
+/**
+ * One landed compaction's summarizer usage, served as an array by the Host
+ * `statusbarCompactionUsage` projection. `items`/`tokens` repeat the replaced
+ * history counts the shipped marker prints, so a rendered row can be matched
+ * to its compaction without another DOM identity.
+ */
+export interface CompactionUsageEntry {
+  seq: number
+  items: number
+  tokens: number
+  inputTokens: number
+  outputTokens: number
+}
+
 /** Approximate provider-anchored context occupancy. */
 export interface ContextPressureProjection {
   pressureTokens?: number

@@ -1,6 +1,6 @@
 {
   "meta": {
-    "title": "Statusbar Enhancement",
-    "description": "增强 DeepSeek Harness 状态栏，显示会话累计与当前窗口的累计 Token 用量。"
+    "title": "状态栏增强",
+    "description": "在 DSH 输入框下方显示会话累计与当前窗口的 Token 用量，并把每轮完成的用量改为缓存读取/未缓存输入/输出三项。"
   }
 }
