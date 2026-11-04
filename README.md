@@ -63,8 +63,9 @@ Session: ${cacheRead}/${uncachedInput}/${output} | Window: ${windowCacheRead}/${
 
 - 始终生效，没有独立开关。数据库图标、悬停底色、点击打开的官方「本轮用量」明细弹窗（含精确整数、缓存命中率、提供方/模型）以及 <480px 窄屏只留图标的行为全部沿用原生。
 - 固定使用紧凑三项格式，不读取上面的自定义模板。
-- 数据取该 Turn 的 `turn-tail` 节点 `tokenUsage`（缓存读取 / 未缓存输入 / 输出），不重新计算计费。
-- 若提供方从未上报缓存读取，胶囊保留原生 `用量 x tok`，不伪造 `0`。
+- 数据优先取该 Turn 的 `turn-tail` 节点 `tokenUsage`（缓存读取 / 未缓存输入 / 输出），不重新计算计费。
+- DSH 在本轮任一次调用未上报缓存读取时会隐藏整项；此时插件改用自建的 `statusbarTurnUsage` 会话投影——按同一批 `assistant/message` / `assistant/attempt` 事件重新累加，**未上报的桶按 0 参与计算**——因此单次缺失不再让整轮退回原生总量。例如某轮首次调用 19.8K 输入未带缓存字段、后续 22 次共读缓存 684K，胶囊显示 `684K/47.4K/9.3K` 而不是总量。
+- 提供方完全不上报缓存读取时，同样按 0 显示（如 `0/8.2K/31`）；只有该轮完全没有计费数据时才保留原生 `用量 x tok`。
 - 实现说明：dsh 0.2.1 没有 per-Turn 用量 Slot，原生胶囊硬编码在 `TurnTailNodeView` 内。插件注册一个**渲染为空**的 `conversation.chat.turnTail` 条目，把本轮数值写到 Turn 尾巴根节点，再用局部 CSS 隐藏原生文案并显示三项计数。替换整体 `turn-tail` 渲染器（`shadows-shipped-ui`）会连带重写复制/分支/反馈/时钟，因此不采用。
 
 ## 压缩标记

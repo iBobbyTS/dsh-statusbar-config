@@ -43,6 +43,20 @@ export interface CompactionUsageEntry {
   outputTokens: number
 }
 
+/**
+ * One Turn's summed buckets, served as an array by the Host
+ * `statusbarTurnUsage` projection. An attempt that omitted a bucket
+ * contributes zero to it, so unlike the Turn-tail `tokenUsage` aggregate the
+ * cache-read split is always present.
+ */
+export interface TurnUsageEntry {
+  turn: number
+  uncachedInputTokens: number
+  cacheReadTokens: number
+  cacheWriteTokens: number
+  outputTokens: number
+}
+
 /** Approximate provider-anchored context occupancy. */
 export interface ContextPressureProjection {
   pressureTokens?: number

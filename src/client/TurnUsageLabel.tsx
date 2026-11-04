@@ -7,9 +7,11 @@
  * collapse all stay exactly as shipped.
  */
 import { useLayoutEffect, useSyncExternalStore } from 'react'
-import type { SnapshotSelector } from './types.js'
+import type { ProjectionReader } from './compaction-label.js'
+import type { SnapshotSelector, TurnUsageEntry } from './types.js'
 import {
-  readTurnUsageSource, turnNumberOf, turnUsageLabel, type ChatSnapshotLike, type TurnOwnerLike,
+  TURN_USAGE_PROJECTION, readTurnUsageSource, resolveTurnUsageLabel, turnNumberOf, turnUsageEntryFor,
+  type ChatSnapshotLike, type TurnOwnerLike,
 } from './turn-usage.js'
 
 /** Turn-tail root marker; the scoped CSS only rewrites a marked tail. */
@@ -22,18 +24,24 @@ export interface TurnUsageLabelProps {
   /** Owning completed Turn, as the Turn-tail owner hands it over. */
   turn: TurnOwnerLike
   useChat: SnapshotSelector<ChatSnapshotLike>
+  /** Session standard-props projection reader; narrower assemblies omit it. */
+  useProjection?: ProjectionReader
 }
 
 /**
  * Publish one Turn's usage label on its Turn-tail root.
- * @param props - owning Turn and the Chat snapshot selector seat.
+ * @param props - owning Turn, the Chat snapshot selector seat, and the Session
+ * projection reader carrying the plugin's own per-Turn sums.
  * @returns null; this entry owns no visible row of its own.
  */
-export function TurnUsageLabel({ turn, useChat }: TurnUsageLabelProps): null {
+export function TurnUsageLabel({ turn, useChat, useProjection }: TurnUsageLabelProps): null {
   const turnNumber = turnNumberOf(turn)
   const source = useChat(snapshot => readTurnUsageSource(snapshot, turnNumber))
   const data = useSyncExternalStore(source.subscribe, source.getSnapshot, source.getSnapshot)
-  const label = turnUsageLabel(data)
+  const entries = useProjection === undefined
+    ? undefined
+    : useProjection<readonly TurnUsageEntry[]>(TURN_USAGE_PROJECTION)
+  const label = resolveTurnUsageLabel(data, turnUsageEntryFor(entries, turnNumber))
 
   useLayoutEffect(() => {
     const root = document.querySelector<HTMLElement>(`[data-turn-tail="${turnNumber}"]`)

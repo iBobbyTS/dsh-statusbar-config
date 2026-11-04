@@ -12,6 +12,7 @@ import type { Context } from '@deepseek-ai/cordis'
 import Schema from '@deepseek-ai/schemastery'
 import { DEFAULT_SETTINGS, type StatusbarSettings } from './settings.js'
 import { compactionUsageProjectionDefinition } from './compaction-usage.js'
+import { turnUsageProjectionDefinition } from './turn-usage.js'
 import { windowUsageProjectionDefinition } from './window-usage.js'
 
 export const name = 'dsh-statusbar-config'
@@ -30,6 +31,7 @@ export function apply(ctx: Context): void {
   // The Session Projection registry owns replay, checkpointing and lifecycle.
   ctx.inject(['sessionProjections'], async (scoped) => {
     await scoped.sessionProjections.register(windowUsageProjectionDefinition)
+    await scoped.sessionProjections.register(turnUsageProjectionDefinition)
     await scoped.sessionProjections.register(compactionUsageProjectionDefinition)
   })
 }

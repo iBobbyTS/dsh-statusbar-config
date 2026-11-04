@@ -7,8 +7,17 @@
  * Chat node (copy, branch, feedback, clock and two child Slots would have to
  * be re-owned). This module therefore only carries data and text; the
  * `TurnUsageLabel` entry hands the text to the scoped CSS override.
+ *
+ * The shipped Turn-tail aggregate hides its cache-read bucket once any attempt
+ * in the Turn omitted it; the Host `statusbarTurnUsage` projection re-sums the
+ * same events with an omitted bucket counting as zero, and the label falls
+ * back to that instead of returning to the shipped total.
  */
 import { formatTokens } from './stats.js'
+import type { TurnUsageEntry } from './types.js'
+
+/** Host projection key carrying one entry per Turn's summed usage. */
+export const TURN_USAGE_PROJECTION = 'statusbarTurnUsage'
 
 /** The subset of a Turn's provider-reported buckets the label displays. */
 export interface TurnUsageLike {
@@ -106,4 +115,47 @@ export function turnUsageLabel(data: readonly TurnTailDataLike[]): string | null
     if (label !== null) return label
   }
   return null
+}
+
+/**
+ * Format one Turn's plugin-summed buckets in the pill's compact counters.
+ * @param entry - the Turn's Host-projection sums, where an attempt that
+ * omitted a bucket contributed zero.
+ * @returns `cache-read/uncached-input/output`.
+ */
+export function formatTurnBucketsLabel(entry: TurnUsageEntry): string {
+  return [
+    formatTokens(entry.cacheReadTokens),
+    formatTokens(entry.uncachedInputTokens),
+    formatTokens(entry.outputTokens),
+  ].join('/')
+}
+
+/**
+ * Find one Turn's summed buckets among the projection entries.
+ * @param entries - per-Turn sums from the Host projection, absent before the
+ * projection has loaded.
+ * @param turn - owning Turn number.
+ * @returns the Turn's entry, the latest one; undefined when absent.
+ */
+export function turnUsageEntryFor(entries: readonly TurnUsageEntry[] | undefined, turn: number): TurnUsageEntry | undefined {
+  if (entries === undefined) return undefined
+  for (let index = entries.length - 1; index >= 0; index -= 1) {
+    if (entries[index]?.turn === turn) return entries[index]
+  }
+  return undefined
+}
+
+/**
+ * Resolve one Turn's label: the shipped Turn-tail aggregate while it carries
+ * cache reads, else the plugin's own sum where an omitted bucket counts as
+ * zero, so a single omitted attempt no longer hides the Turn's split.
+ * @param data - the Turn's Turn-tail entries, in anchor order.
+ * @param fallback - the Turn's plugin-summed buckets, when loaded.
+ * @returns the label, or null when neither source carries accounting.
+ */
+export function resolveTurnUsageLabel(data: readonly TurnTailDataLike[], fallback: TurnUsageEntry | undefined): string | null {
+  const shipped = turnUsageLabel(data)
+  if (shipped !== null) return shipped
+  return fallback === undefined ? null : formatTurnBucketsLabel(fallback)
 }

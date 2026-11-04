@@ -3,7 +3,7 @@
  * The Session cumulative usage continues to come from DSH's tokenUsage.
  */
 import { z } from 'zod'
-import { asRecord, bucketsFrom, bucketsSchema, isCount, type TokenBuckets } from './usage-buckets.js'
+import { asRecord, bucketsSchema, equalTokenBuckets, isCount, usageOfEvent, type TokenBuckets } from './usage-buckets.js'
 
 const viewSchema = bucketsSchema.extend({
   compactionCount: z.number().int().nonnegative(),
@@ -27,30 +27,6 @@ function emptyBuckets(): TokenBuckets {
 
 export function initialWindowUsage(): WindowUsageState {
   return { window: { ...emptyBuckets(), compactionCount: 0 }, last: null }
-}
-
-/** Match token-meter's assistant/message authority and compact stream reader. */
-function usageOf(event: Record<string, unknown>): TokenBuckets | undefined {
-  if (event.type !== 'assistant/message' && event.type !== 'assistant/attempt') return
-  const data = asRecord(event.data)
-  if (!data) return
-  if (event.type === 'assistant/message' && data.usage !== undefined) return bucketsFrom(data.usage)
-  const stream = data.stream
-  if (!Array.isArray(stream)) return
-  for (let i = stream.length - 1; i >= 0; i--) {
-    const member = asRecord(stream[i])
-    if (member?.type !== 'chunk') continue
-    const chunk = asRecord(member.chunk)
-    if (chunk?.type === 'usage') return bucketsFrom(chunk.usage)
-  }
-  return
-}
-
-function equal(a: TokenBuckets, b: TokenBuckets): boolean {
-  return a.uncachedInputTokens === b.uncachedInputTokens
-    && a.cacheReadTokens === b.cacheReadTokens
-    && a.cacheWriteTokens === b.cacheWriteTokens
-    && a.outputTokens === b.outputTokens
 }
 
 /** Pure event fold; persisted Session logs rebuild historic Window epochs. */
@@ -78,11 +54,11 @@ export function foldWindowUsage(state: WindowUsageState, incoming: unknown): Win
 
   if (event.type !== 'assistant/message' && event.type !== 'assistant/attempt') return state
   if (!data || !isCount(data.turn) || !isCount(data.step)) return state
-  const usage = usageOf(event)
+  const usage = usageOfEvent(event)
   if (!usage) return state
   const previous = state.last !== null && state.last.turn === data.turn && state.last.step === data.step
     ? state.last.buckets : undefined
-  if (previous && equal(previous, usage)) return state
+  if (previous && equalTokenBuckets(previous, usage)) return state
 
   return {
     window: {

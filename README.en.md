@@ -63,8 +63,9 @@ Each completed Turn's usage pill shows that Turn's own counters, in the same ord
 
 - Always on; there is no separate toggle. The database icon, hover background, the native “Turn usage” click dialog (exact integers, cache-hit percent, provider/model) and the shipped icon-only collapse below 480px all stay.
 - It always uses this compact three-counter form and ignores the custom template above.
-- Values come from that Turn's `turn-tail` Chat node `tokenUsage` (cache read / uncached input / output); no billing is recomputed.
-- When the provider never reported cache reads, the pill keeps DSH's native `Usage x tok` instead of inventing a `0`.
+- Values prefer that Turn's `turn-tail` Chat node `tokenUsage` (cache read / uncached input / output); no billing is recomputed.
+- DSH hides the whole cache-read bucket once any attempt in the Turn omitted it. In that case the pill falls back to the plugin's own `statusbarTurnUsage` session projection, which re-sums the same `assistant/message` / `assistant/attempt` events **with an omitted bucket counting as zero**, so a single omitted attempt no longer returns the Turn to the native total. For example, a Turn whose first 19.8K-input call carried no cache field and whose later 22 calls read 684K from cache shows `684K/47.4K/9.3K`.
+- A provider that never reports cache reads likewise shows an explicit zero (e.g. `0/8.2K/31`); only a Turn with no billed usage at all keeps DSH's native `Usage x tok`.
 - Implementation: dsh 0.2.1 exposes no per-Turn usage Slot — the pill is built inside `TurnTailNodeView`. The plugin registers a **null-rendering** `conversation.chat.turnTail` entry that publishes the Turn's counters on the Turn-tail root, and a scoped CSS override hides the shipped text and renders the three counters. Replacing the whole `turn-tail` renderer (`shadows-shipped-ui`) would re-own copy/branch/feedback/clock, so it is not used.
 
 ## Compaction marker

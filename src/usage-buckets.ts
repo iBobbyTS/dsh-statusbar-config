@@ -39,3 +39,32 @@ export function bucketsFrom(raw: unknown): TokenBuckets | undefined {
     outputTokens: usage.outputTokens,
   }
 }
+
+/**
+ * Read one committed assistant event's reported usage, matching token-meter's
+ * assistant/message authority and compact stream reader; a missing bucket is
+ * normalized to zero.
+ */
+export function usageOfEvent(event: Record<string, unknown>): TokenBuckets | undefined {
+  if (event.type !== 'assistant/message' && event.type !== 'assistant/attempt') return
+  const data = asRecord(event.data)
+  if (!data) return
+  if (event.type === 'assistant/message' && data.usage !== undefined) return bucketsFrom(data.usage)
+  const stream = data.stream
+  if (!Array.isArray(stream)) return
+  for (let i = stream.length - 1; i >= 0; i--) {
+    const member = asRecord(stream[i])
+    if (member?.type !== 'chunk') continue
+    const chunk = asRecord(member.chunk)
+    if (chunk?.type === 'usage') return bucketsFrom(chunk.usage)
+  }
+  return
+}
+
+/** Structural bucket equality for the replace-vs-add fold seams. */
+export function equalTokenBuckets(a: TokenBuckets, b: TokenBuckets): boolean {
+  return a.uncachedInputTokens === b.uncachedInputTokens
+    && a.cacheReadTokens === b.cacheReadTokens
+    && a.cacheWriteTokens === b.cacheWriteTokens
+    && a.outputTokens === b.outputTokens
+}
