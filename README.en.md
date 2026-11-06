@@ -9,6 +9,10 @@ This fork displays cache-read / uncached-input / output counters while retaining
 - ContextMeter shows used / capacity, independently of Window billing.
 - Missing accounting or ambiguous compaction matches retain native display. Decorations stay within their owning conversation.
 
+## Compatibility
+
+Verified: DSH 0.2.2-rc.1 (source review and automated checks); Desktop testing has not been completed.
+
 ## Install
 
 Install this fork:
@@ -23,6 +27,6 @@ For Desktop, launch it once, quit it, and use its bundled CLI. Use `--profile we
 
 Edit the template in **Settings → Plugins → Status bar template**. Counters default to cache reads / uncached input / output; click a usage pill for exact counts. Window is cumulative billing since compaction, not current context occupancy.
 
-The [detailed guide](docs/usage.md) covers template variables, accounting, fallbacks, compaction markers, plugin integration and development commands. Source and automated checks targeted DSH `0.2.2-rc.1`; a real Desktop UI acceptance pass is separate.
+The [detailed guide](docs/usage.md) covers template variables, accounting, fallbacks, compaction markers, plugin integration and development commands.
 
 Original author MannixHu; the fork retains the MIT license and attribution.
