@@ -33,7 +33,7 @@ export interface WindowUsageProjection extends TokenUsageProjection {
  * One landed compaction's summarizer usage, served as an array by the Host
  * `statusbarCompactionUsage` projection. `items`/`tokens` repeat the replaced
  * history counts the shipped marker prints, so a rendered row can be matched
- * to its compaction without another DOM identity.
+ * only when the pair is unique within this Session.
  */
 export interface CompactionUsageEntry {
   seq: number

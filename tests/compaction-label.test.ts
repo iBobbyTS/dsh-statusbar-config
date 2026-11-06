@@ -14,7 +14,8 @@ function marker(summaryText: string) {
   const button = {
     lastElementChild: { textContent: summaryText },
     setAttribute: vi.fn(),
-    style: { setProperty: vi.fn() },
+    removeAttribute: vi.fn(),
+    style: { setProperty: vi.fn(), removeProperty: vi.fn() },
   }
   const icon = { closest: () => button }
   const root = { querySelectorAll: () => [icon] } as unknown as ParentNode
@@ -92,5 +93,26 @@ describe('compaction marker label', () => {
       querySelector: () => null,
     } as unknown as Node
     expect(markerButtonsIn([text, unrelated])).toEqual([])
+  })
+})
+
+
+describe('ambiguous and removed compaction usage', () => {
+  it('keeps native text when two distinct events have the same printed counts', () => {
+    const duplicate = { ...entry, seq: entry.seq + 10, outputTokens: 100 }
+    const row = marker('已压缩 709 条历史记录（约 413235 tokens）')
+    expect(entriesByCounts([entry, duplicate]).has(countsKey(entry))).toBe(false)
+    applyCompactionLabels(row.root, [entry, duplicate])
+    expect(row.button.setAttribute).not.toHaveBeenCalled()
+    expect(row.button.removeAttribute).toHaveBeenCalledWith(COMPACTION_LABEL_ATTRIBUTE)
+  })
+
+  it('releases an existing label when its projection disappears or becomes ambiguous', () => {
+    const row = marker('已压缩 709 条历史记录（约 413235 tokens）')
+    applyCompactionLabels(row.root, [entry])
+    applyCompactionLabels(row.root, [])
+    expect(row.button.style.removeProperty).toHaveBeenCalledWith(COMPACTION_LABEL_PROPERTY)
+    applyCompactionLabels(row.root, [entry, { ...entry, seq: 5000 }])
+    expect(row.button.removeAttribute).toHaveBeenCalledWith(COMPACTION_LABEL_ATTRIBUTE)
   })
 })

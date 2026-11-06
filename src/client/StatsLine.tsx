@@ -8,6 +8,7 @@ import { useCompactionLabelPatch } from './compaction-label.js'
 import { useForkRowUsagePatch } from './fork-row-usage.js'
 
 export interface DockProps {
+  sessionId: string
   settings: SettingsScopeLike<StatusbarSettings>
   t: Translate
   useChat: SnapshotSelector<{ legacy: { nodes: readonly ConversationNode[] } }>
@@ -15,7 +16,7 @@ export interface DockProps {
 }
 
 /** Replace only the native session `usage` entry. */
-export function ConfigurableStatsLine({ settings, t, useChat, useProjection }: DockProps) {
+export function ConfigurableStatsLine({ sessionId, settings, t, useChat, useProjection }: DockProps) {
   const snapshot = useSyncExternalStore(
     listener => settings.subscribe(listener),
     () => settings.getSnapshot(),
@@ -23,10 +24,11 @@ export function ConfigurableStatsLine({ settings, t, useChat, useProjection }: D
   )
   // Always on: labelling the compaction markers is independent of this row's
   // own visibility and of the `enabled` setting.
-  useCompactionLabelPatch(useProjection)
+  const decorationRef = useRef<HTMLSpanElement>(null)
+  useCompactionLabelPatch(useProjection, decorationRef, sessionId)
   // The Compaction Fork row publishes its own buckets; this replaces its usage
   // text with the same format as the Turn pill.
-  useForkRowUsagePatch()
+  useForkRowUsagePatch(decorationRef, sessionId)
   const settledNodes = useChat(s => s.legacy.nodes)
   const usage = useProjection<TokenUsageProjection>('tokenUsage')
   const windowUsage = useProjection<WindowUsageProjection>('statusbarWindowUsage')
@@ -89,9 +91,10 @@ export function ConfigurableStatsLine({ settings, t, useChat, useProjection }: D
     }
   }, [open])
 
-  if (line === '' || usage === undefined) return null
+  const anchor = <span hidden aria-hidden="true" ref={decorationRef} />
+  if (line === '' || usage === undefined) return anchor
   const exact = (n: number) => n.toLocaleString()
-  return <span ref={rootRef} className="dsc-stats" data-composer-stat="usage" data-dsh-statusbar-config="true">
+  return <>{anchor}<span ref={rootRef} className="dsc-stats" data-composer-stat="usage" data-dsh-statusbar-config="true">
     <button type="button" className="dsc-stats-trigger" title={truncated ? line : undefined}
       aria-label={line} aria-haspopup="dialog" aria-expanded={open}
       onClick={() => setOpen(current => !current)}>
@@ -128,5 +131,5 @@ export function ConfigurableStatsLine({ settings, t, useChat, useProjection }: D
         <dt>{t('stats.usageOutput')}</dt><dd>{exact(windowUsage.outputTokens)}</dd>
       </dl>}
     </div>}
-  </span>
+  </span></>
 }

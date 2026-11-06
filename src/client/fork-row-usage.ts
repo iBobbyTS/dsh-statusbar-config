@@ -7,11 +7,11 @@
  * same cache-read/uncached-input/output label the shipped Turn pill gets.
  *
  * The row dispatches a bubbling `dsh-fork-row-usage` event when it mounts; this
- * patch also scans the document once for rows that mounted before the plugin.
+ * patch also scans its conversation for rows that mounted before the plugin.
  * Nothing is polled, and the usage pill, its database glyph and the
  * narrow-viewport icon-only collapse stay exactly the row's own.
  */
-import { useLayoutEffect } from 'react'
+import { useLayoutEffect, type RefObject } from 'react'
 import { formatTurnUsageLabel, type TurnUsageLike } from './turn-usage.js'
 
 /** Row marker published by the fork plugin: the compaction's summary event seq. */
@@ -77,22 +77,27 @@ export function applyForkRowUsageLabels(root: ParentNode): void {
  * Keep every rendered compaction row labelled with this plugin's format.
  * Mounted from the always-rendered composer dock entry, like the marker patch.
  */
-export function useForkRowUsagePatch(): void {
+export function useForkRowUsagePatch(anchor: RefObject<HTMLElement>, sessionId: string): void {
   useLayoutEffect(() => {
-    if (typeof document === 'undefined') return
-    applyForkRowUsageLabels(document)
+    const scope = anchor.current?.closest('[data-conversation-content]')
+    if (scope === undefined || scope === null) return
+    applyForkRowUsageLabels(scope)
     const onRow = (event: Event) => {
       const target = event.target
       if (target instanceof Element && target.hasAttribute(FORK_ROW_USAGE_ATTRIBUTE)) {
         applyForkRowUsage(target)
       }
     }
-    document.addEventListener(FORK_ROW_USAGE_EVENT, onRow)
+    scope.addEventListener(FORK_ROW_USAGE_EVENT, onRow)
     // A row can mount in the same commit as this dock entry.
-    const timer = setTimeout(() => { applyForkRowUsageLabels(document) }, 300)
+    const timer = setTimeout(() => { applyForkRowUsageLabels(scope) }, 300)
     return () => {
-      document.removeEventListener(FORK_ROW_USAGE_EVENT, onRow)
+      scope.removeEventListener(FORK_ROW_USAGE_EVENT, onRow)
+      for (const pill of scope.querySelectorAll(`[${FORK_ROW_USAGE_MARK}]`)) {
+        pill.removeAttribute(FORK_ROW_USAGE_MARK)
+        ;(pill as HTMLElement).style.removeProperty(FORK_ROW_USAGE_PROPERTY)
+      }
       clearTimeout(timer)
     }
-  }, [])
+  }, [anchor, sessionId])
 }

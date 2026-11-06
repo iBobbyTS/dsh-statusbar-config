@@ -53,7 +53,7 @@ export function apply(ctx: ClientContextLike): void {
     inject: () => ({ settings }) as Record<string, unknown>,
   }, ConfigurableStatsLine))
 
-  // No per-Turn usage Slot exists in DSH: this null-rendering entry publishes
+  // No per-Turn usage Slot exists in DSH: this invisible entry publishes
   // the Turn's counters on its Turn-tail root for the scoped CSS override.
   ctx.slots.inject('conversation.chat.turnTail', () => ctx.slots.register({
     name: 'conversation.chat.turnTail',

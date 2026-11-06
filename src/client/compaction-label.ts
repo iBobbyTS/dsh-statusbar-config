@@ -7,13 +7,13 @@
  * There is a `conversation.chat.commandview` Slot keyed by command name, but
  * replacing the row would re-own the context icon, the hover disclosure, the
  * expandable Markdown summary and the pinned-header layout. The Host
- * projection therefore carries the usage, a null-rendering decorator (the
+ * projection therefore carries the usage, a invisible decorator (the
  * composer dock entry, which is always mounted) matches each rendered marker
- * by the two counts it still prints, and the plugin stylesheet hides the
+ * by the two counts it still prints when that pair is unique. The stylesheet hides the
  * shipped text and shows the label from a custom property. The row itself
  * stays exactly the shipped one.
  */
-import { useEffect, useLayoutEffect, useRef } from 'react'
+import { useLayoutEffect, type RefObject } from 'react'
 import { formatTokens } from './stats.js'
 import type { CompactionUsageEntry } from './types.js'
 
@@ -70,7 +70,13 @@ export function countsKey(counts: ShadowedCounts): string {
 /** Index the projection entries by the counts each marker prints. */
 export function entriesByCounts(entries: readonly CompactionUsageEntry[]): Map<string, CompactionUsageEntry> {
   const byCounts = new Map<string, CompactionUsageEntry>()
-  for (const entry of entries) byCounts.set(countsKey(entry), entry)
+  const ambiguous = new Set<string>()
+  for (const entry of entries) {
+    const key = countsKey(entry)
+    if (byCounts.has(key)) ambiguous.add(key)
+    else byCounts.set(key, entry)
+  }
+  for (const key of ambiguous) byCounts.delete(key)
   return byCounts
 }
 
@@ -83,14 +89,21 @@ export function entriesByCounts(entries: readonly CompactionUsageEntry[]): Map<s
  */
 export function labelMarkerButton(button: Element, byCounts: Map<string, CompactionUsageEntry>): boolean {
   const summary = button.lastElementChild
-  if (summary === null) return false
-  const counts = shadowedCounts(summary.textContent ?? '')
-  if (counts === undefined) return false
-  const entry = byCounts.get(countsKey(counts))
-  if (entry === undefined) return false
+  const counts = summary === null ? undefined : shadowedCounts(summary.textContent ?? '')
+  const entry = counts === undefined ? undefined : byCounts.get(countsKey(counts))
+  if (entry === undefined) {
+    clearMarkerLabel(button)
+    return false
+  }
   button.setAttribute(COMPACTION_LABEL_ATTRIBUTE, 'true')
   ;(button as HTMLElement).style.setProperty(COMPACTION_LABEL_PROPERTY, JSON.stringify(compactionUsageLabel(entry)))
   return true
+}
+
+/** Release only the text decoration owned by this plugin. */
+function clearMarkerLabel(button: Element): void {
+  button.removeAttribute(COMPACTION_LABEL_ATTRIBUTE)
+  ;(button as HTMLElement).style.removeProperty(COMPACTION_LABEL_PROPERTY)
 }
 
 /**
@@ -123,7 +136,6 @@ export function markerButtonsIn(nodes: Iterable<Node>): Element[] {
  * @param entries - projection entries for this Session.
  */
 export function applyCompactionLabels(root: ParentNode, entries: readonly CompactionUsageEntry[]): void {
-  if (entries.length === 0) return
   const byCounts = entriesByCounts(entries)
   for (const icon of root.querySelectorAll(MARKER_ICON)) {
     const button = icon.closest('button')
@@ -139,34 +151,24 @@ export function applyCompactionLabels(root: ParentNode, entries: readonly Compac
  * transcript mounts later.
  * @param useProjection - Session standard-props projection reader.
  */
-export function useCompactionLabelPatch(useProjection: ProjectionReader): void {
+export function useCompactionLabelPatch(useProjection: ProjectionReader, anchor: RefObject<HTMLElement>, sessionId: string): void {
   const entries = useProjection<readonly CompactionUsageEntry[]>(COMPACTION_USAGE_PROJECTION)
-  const latest = useRef<readonly CompactionUsageEntry[] | undefined>(entries)
-  latest.current = entries
 
-  // Markers already painted when the projection arrives, and every repaint
-  // that follows from a new compaction.
   useLayoutEffect(() => {
-    if (typeof document === 'undefined' || entries === undefined) return
-    applyCompactionLabels(document, entries)
-  }, [entries])
-
-  // Markers painted later — session hydration finishing after the dock, a
-  // scrolled-back history window, a row the transcript re-creates — never
-  // re-run the effect above, so observe the tree instead of timing one
-  // deferred pass and losing every row that mounts after it.
-  useEffect(() => {
-    if (typeof document === 'undefined' || typeof MutationObserver === 'undefined') return
+    const scope = anchor.current?.closest('[data-conversation-content]')
+    if (scope === undefined || scope === null) return
+    applyCompactionLabels(scope, entries ?? [])
+    if (typeof MutationObserver === 'undefined') return () => { applyCompactionLabels(scope, []) }
     const queue = new Set<Element>()
     let frame: number | undefined
     const flush = () => {
       frame = undefined
       const pending = [...queue]
       queue.clear()
-      const current = latest.current
-      if (current === undefined || current.length === 0) return
-      const byCounts = entriesByCounts(current)
-      for (const button of pending) labelMarkerButton(button, byCounts)
+      const byCounts = entriesByCounts(entries ?? [])
+      for (const button of pending) {
+        if (scope.contains(button)) labelMarkerButton(button, byCounts)
+      }
     }
     const schedule = (buttons: readonly Element[]) => {
       if (buttons.length === 0) return
@@ -189,10 +191,11 @@ export function useCompactionLabelPatch(useProjection: ProjectionReader): void {
       }
       schedule(touched)
     })
-    observer.observe(document.body, { childList: true, subtree: true, characterData: true })
+    observer.observe(scope, { childList: true, subtree: true, characterData: true })
     return () => {
       observer.disconnect()
       if (frame !== undefined) cancelAnimationFrame(frame)
+      applyCompactionLabels(scope, [])
     }
-  }, [])
+  }, [entries, anchor, sessionId])
 }
