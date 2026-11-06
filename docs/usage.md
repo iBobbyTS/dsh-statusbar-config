@@ -87,7 +87,7 @@ pnpm install --frozen-lockfile
 pnpm check
 ```
 
-The Git plugin installer loads checked-in `lib/index.js` and `lib/client.js`; `pnpm build` also refreshes their source maps. Source and generated entrypoints are delivered together.
+The Git plugin installer loads checked-in `lib/index.js` and `lib/client.js`; `pnpm build:runtime` also refreshes their source maps. Source and generated entrypoints are delivered together.
 
 The configuration page is projected by dsh's settings service from the Host `Config` schema: only fields marked `.volatile()` reach `settings/describe`. Without the flag the whole namespace is unavailable and the template editor renders “settings namespace unavailable” with every control disabled. Saved values land in the profile's `cordis.patch.yml`, and the Loader re-applies this plugin with the new config.
 
@@ -95,3 +95,9 @@ The configuration page is projected by dsh's settings service from the Host `Con
 ## Validation scope
 
 Source contracts and automated checks targeted DSH `0.2.2-rc.1`. They do not establish a real Desktop UI acceptance result.
+
+## Build and distribution checks
+
+Use Node 24.11.0 and the `packageManager` pnpm version for maintenance. `pnpm install --frozen-lockfile` prepares development dependencies. `pnpm typecheck` checks Host and Client separately; `pnpm build:runtime` refreshes generated `lib/`; `pnpm test` builds an isolated candidate before testing; `pnpm check:dist` independently rebuilds and compares all artifacts, then packs and tests clean tarball/Git installation. `pnpm check` combines these with one candidate build. Installation uses prebuilt JS; it runs no plugin compiler lifecycle hook.
+
+Automated/source checks target DSH 0.2.2-rc.1. Desktop interaction and real user accounts remain separate validation.

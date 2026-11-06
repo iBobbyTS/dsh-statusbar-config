@@ -9,3 +9,5 @@ This fork changes usage presentation and supplies missing usage projections. It 
 - Run `pnpm check` for affected implementation changes. Validate version-sensitive seams against the intended DSH release and distinguish automated/source checks from Desktop UI acceptance.
 
 [README](README.md) owns installation and the human entry. Detailed data and display contracts have one owner in `docs/usage.md`.
+
+开发、构建与交付遵循父目录 [统一规范](../docs/plugin-development.md)。`src/` 是编辑源，`lib/` 由显式构建生成并与源码一同交付。

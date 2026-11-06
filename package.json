@@ -12,17 +12,15 @@
     "./locale/*.json": "./locale/*.json"
   },
   "files": [
-    "lib/index.js",
-    "lib/index.js.map",
-    "lib/client.js",
-    "lib/client.js.map",
     "cordis.patch.yml",
     "README.md",
     "README.en.md",
     "docs",
     "LICENSE",
     "locale/*.json",
-    "icon.svg"
+    "icon.svg",
+    "lib",
+    "src"
   ],
   "dsh": {
     "bundle": {
@@ -39,11 +37,11 @@
     }
   },
   "scripts": {
-    "clean": "rimraf lib",
-    "typecheck": "tsc --noEmit",
-    "build": "pnpm clean && tsdown",
-    "check": "pnpm typecheck && pnpm build && pnpm test",
-    "test": "vitest run"
+    "typecheck": "tsc -p tsconfig.host.json && tsc -p tsconfig.client.json && tsc -p tsconfig.tests.json",
+    "check": "node scripts/check.mjs all",
+    "test": "node scripts/check.mjs test",
+    "build:runtime": "node scripts/build-runtime.mjs",
+    "check:dist": "node scripts/check.mjs dist"
   },
   "keywords": [
     "deepseek-harness",
@@ -70,16 +68,15 @@
     }
   },
   "devDependencies": {
-    "@deepseek-ai/cordis": "^4.0.2",
-    "@deepseek-ai/dsh-settings": "^0.1.2-alpha.4",
-    "@deepseek-ai/schemastery": "^3.18.5",
-    "@types/node": "^22.15.0",
-    "@types/react": "~18.3.1",
-    "react": "^18.3.1",
-    "rimraf": "^6.0.1",
-    "tsdown": "^0.22.14",
-    "typescript": "^5.9.3",
-    "vitest": "^4.1.11"
+    "@deepseek-ai/cordis": "4.1.0",
+    "@deepseek-ai/dsh-settings": "0.2.2-rc.1",
+    "@deepseek-ai/schemastery": "3.19.0",
+    "@types/node": "22.20.5",
+    "@types/react": "18.3.31",
+    "react": "18.3.1",
+    "tsdown": "0.22.14",
+    "typescript": "5.9.3",
+    "vitest": "4.1.11"
   },
   "homepage": "https://github.com/iBobbyTS/dsh-statusbar-config#readme",
   "repository": {
@@ -90,5 +87,6 @@
   "author": "MannixHu",
   "dependencies": {
     "zod": "^4.5.4"
-  }
+  },
+  "packageManager": "pnpm@10.28.2"
 }

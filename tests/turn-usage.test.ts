@@ -10,7 +10,8 @@ const usage = { cacheReadTokens: 70_000_000, uncachedInputTokens: 1_000_000, out
 
 describe('turnNumberOf', () => {
   it('reads the number out of the Turn location DSH hands to Turn tails', () => {
-    expect(turnNumberOf({ turn: 54, start: {}, end: {}, status: 'closed', steps: [] })).toBe(54)
+    const location = { turn: 54, start: {}, end: {}, status: 'closed', steps: [] }
+    expect(turnNumberOf(location)).toBe(54)
   })
 
   it('accepts a bare Turn number', () => {
