@@ -11,7 +11,9 @@ This fork displays cache-read / uncached-input / output counters while retaining
 
 ## Compatibility
 
-Verified: DSH 0.2.2-rc.1 (source review and automated checks); Desktop testing has not been completed.
+Verified: DSH 0.2.2-rc.2 (source review and minimal automated compatibility checks); Desktop testing has not been completed.
+
+An isolated DSH 0.2.2-rc.2 Web instance passed three-bucket value display, Window reset after compaction, and separate Session/Window counters when continuing an ordinary fork, using synthetic usage data. Desktop acceptance remains untested.
 
 ## Install
 

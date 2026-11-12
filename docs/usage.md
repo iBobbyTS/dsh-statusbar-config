@@ -47,7 +47,7 @@ Each completed Turn's usage pill shows that Turn's own counters, in the same ord
 - Values prefer that Turn's `turn-tail` Chat node `tokenUsage` (cache read / uncached input / output).
 - DSH hides the whole cache-read bucket once any attempt in the Turn omitted it. In that case the pill falls back to the plugin's own `statusbarTurnUsage` session projection, which re-sums the same `assistant/message` / `assistant/attempt` events **with an omitted bucket counting as zero**, so a single omitted attempt no longer returns the Turn to the native total. For example, a Turn whose first 19.8K-input call carried no cache field and whose later 22 calls read 684K from cache shows `684K/47.4K/9.3K`.
 - A provider that never reports cache reads likewise shows an explicit zero (e.g. `0/8.2K/31`); only a Turn with no billed usage at all keeps DSH's native `Usage x tok`.
-- Implementation: The checked DSH 0.2.2-rc.1 renderer exposes no dedicated per-Turn usage Slot — the pill is built inside `TurnTailNodeView`. The plugin registers a hidden-anchor `conversation.chat.turnTail` entry that publishes the Turn's counters on the Turn-tail root, and a scoped CSS override hides the shipped text and renders the three counters. Replacing the whole `turn-tail` renderer (`shadows-shipped-ui`) would re-own copy/branch/feedback/clock, so it is not used.
+- Implementation: The checked DSH 0.2.2-rc.2 renderer exposes no dedicated per-Turn usage Slot — the pill is built inside `TurnTailNodeView`. The plugin registers a hidden-anchor `conversation.chat.turnTail` entry that publishes the Turn's counters on the Turn-tail root, and a scoped CSS override hides the shipped text and renders the three counters. Replacing the whole `turn-tail` renderer (`shadows-shipped-ui`) would re-own copy/branch/feedback/clock, so it is not used.
 
 ## Compaction marker
 
@@ -94,10 +94,10 @@ The configuration page is projected by dsh's settings service from the Host `Con
 
 ## Validation scope
 
-Source contracts and automated checks targeted DSH `0.2.2-rc.1`. They do not establish a real Desktop UI acceptance result.
+Source contracts and minimal automated compatibility checks target DSH `0.2.2-rc.2`. An isolated rc.2 Web instance additionally verified three-bucket values, Window reset after compaction, and separate Session/Window counters on an ordinary fork continuation with synthetic usage data. This does not establish real billing accuracy or Desktop acceptance.
 
 ## Build and distribution checks
 
 Use Node 24.11.0 and the `packageManager` pnpm version for maintenance. `pnpm install --frozen-lockfile` prepares development dependencies. `pnpm typecheck` checks Host and Client separately; `pnpm build:runtime` refreshes generated `lib/`; `pnpm test` builds an isolated candidate before testing; `pnpm check:dist` independently rebuilds and compares all artifacts, then packs and tests clean tarball/Git installation. `pnpm check` combines these with one candidate build. Installation uses prebuilt JS; it runs no plugin compiler lifecycle hook.
 
-Automated/source checks target DSH 0.2.2-rc.1. Desktop interaction and real user accounts remain separate validation.
+Source review and minimal automated compatibility checks target DSH 0.2.2-rc.2. Desktop interaction and real user accounts remain separate validation.
